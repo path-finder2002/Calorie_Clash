@@ -10,15 +10,14 @@ from .ui import pointer_symbol, q_select, q_checkbox, instruction_select, instru
 
 def _language_menu(ns: argparse.Namespace) -> None:
     lang = getattr(ns, "language", "ja")
-    selected = questionary.select(
+    selected = q_select(
         "言語 / Language",
         choices=[
             questionary.Choice("日本語 (ja)", "ja"),
             questionary.Choice("English (en)", "en"),
         ],
+        ns=ns,
         default=lang if lang in {"ja", "en"} else "ja",
-        pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
-        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask()
     if selected:
         setattr(ns, "language", selected)
@@ -34,11 +33,10 @@ def _rules_menu(ns: argparse.Namespace) -> None:
         ("入力を選択メニューにする（questionary）", "input_menu", input_menu),
         ("アニメーションを有効化（ジャン→ケン→ポン）", "anim_on", anim_on),
     ]
-    selected = questionary.checkbox(
+    selected = q_checkbox(
         "ルール設定（チェックで有効化）",
         choices=[questionary.Choice(label, key, checked=checked) for (label, key, checked) in items],
-        pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
-        instruction=instruction_checkbox(getattr(ns, "language", "ja")),
+        ns=ns,
     ).ask() or []
 
     ns.tie = "bothEat" if "tie_both_eat" in selected else "rematch"
@@ -64,16 +62,16 @@ def _rules_menu(ns: argparse.Namespace) -> None:
 
 def _options_menu(ns: argparse.Namespace) -> None:
     while True:
-        choice = questionary.select(
+        choice = q_select(
             "オプション",
             choices=[
                 questionary.Choice("言語設定 / Language", "lang"),
                 questionary.Choice("ルール設定 / Rules", "rules"),
                 questionary.Choice("カーソル表示 / Cursor", "cursor"),
+                questionary.Choice("色設定 / Colors", "colors"),
                 questionary.Choice("戻る / Back", "back"),
             ],
-            pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
-            instruction=instruction_select(getattr(ns, "language", "ja")),
+            ns=ns,
         ).ask()
         if choice in (None, "back"):
             return
@@ -83,6 +81,8 @@ def _options_menu(ns: argparse.Namespace) -> None:
             _rules_menu(ns)
         elif choice == "cursor":
             _cursor_menu(ns)
+        elif choice == "colors":
+            _colors_menu(ns)
 
 
 def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
@@ -94,15 +94,14 @@ def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
         console.line()
         console.print("[title]Calorie Clash (CLI)[/title]")
         console.line()
-        choice = questionary.select(
+        choice = q_select(
             "メニュー",
             choices=[
                 questionary.Choice("ゲームスタート / Start Game", "start"),
                 questionary.Choice("オプション / Options", "options"),
                 questionary.Choice("終了 / Exit", "exit"),
             ],
-            pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
-            instruction=instruction_select(getattr(ns, "language", "ja")),
+            ns=ns,
         ).ask()
         if choice is None or choice == "exit":
             console.print("[info]Bye![/]")
@@ -123,12 +122,39 @@ def _cursor_menu(ns: argparse.Namespace) -> None:
         questionary.Choice("> (gt)", "gt"),
         questionary.Choice("👉 (hand)", "hand"),
     ]
-    selected = questionary.select(
+    selected = q_select(
         "カーソル表示 / Cursor",
         choices=choices,
+        ns=ns,
         default=ptr_code,
-        pointer=pointer_symbol(ptr_code),
-        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask()
     if selected:
         setattr(ns, "pointer", selected)
+
+
+def _colors_menu(ns: argparse.Namespace) -> None:
+    # Predefined safe colors for prompt_toolkit
+    color_choices = [
+        questionary.Choice("magenta", "magenta"),
+        questionary.Choice("cyan", "cyan"),
+        questionary.Choice("green", "green"),
+        questionary.Choice("yellow", "yellow"),
+        questionary.Choice("blue", "blue"),
+        questionary.Choice("white", "white"),
+    ]
+    ptr_color = q_select(
+        "カーソル色 / Pointer Color",
+        choices=color_choices,
+        ns=ns,
+        default=getattr(ns, "pointer_color", "magenta"),
+    ).ask()
+    if ptr_color:
+        setattr(ns, "pointer_color", ptr_color)
+    ul_color = q_select(
+        "選択箇所の下線色 / Underline Color",
+        choices=color_choices,
+        ns=ns,
+        default=getattr(ns, "underline_color", "cyan"),
+    ).ask()
+    if ul_color:
+        setattr(ns, "underline_color", ul_color)

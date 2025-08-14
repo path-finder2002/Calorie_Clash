@@ -8,7 +8,7 @@ from typing import Optional
 from ..core.engine import is_game_over, play_round
 from ..core.types import Hand, Player, RoundResult, Rules
 from .console import console
-from .ui import pointer_symbol, instruction_select
+from .ui import pointer_symbol, instruction_select, q_select
 
 
 def prompt_hand(player_name: str) -> Optional[Hand]:
@@ -41,8 +41,8 @@ def print_rules(rules: Rules) -> None:
     console.line()
 
 
-def pick_hand_menu(player_name: str, pointer: str, language: str) -> Optional[Hand]:
-    sel = questionary.select(
+def pick_hand_menu(player_name: str, ns) -> Optional[Hand]:
+    sel = q_select(
         f"{player_name} の手を選んでください",
         choices=[
             questionary.Choice("グー (g)", Hand.ROCK),
@@ -52,8 +52,7 @@ def pick_hand_menu(player_name: str, pointer: str, language: str) -> Optional[Ha
             questionary.Choice("— ルールを表示 —", "rules"),
             questionary.Choice("— 終了 —", "quit"),
         ],
-        pointer=pointer,
-        instruction=instruction_select(language),
+        ns=ns,
     ).ask()
     if sel is None:
         return None
@@ -91,6 +90,8 @@ def interactive_loop(
     anim_interval: float = 1.0,
     language: str = "ja",
     pointer_code: str = "tri",
+    pointer_color: str = "magenta",
+    underline_color: str = "cyan",
 ) -> int:
     console.line()
     console.print("[rule]コマンド: :help / :status / :rules / :quit[/rule]")
@@ -102,11 +103,19 @@ def interactive_loop(
         p1_hand: Optional[Hand] = None
         p2_hand: Optional[Hand] = None
         pointer = pointer_symbol(pointer_code)
+        # namespace object for UI helpers
+        from types import SimpleNamespace
+        ui_ns = SimpleNamespace(
+            pointer=pointer_code,
+            language=language,
+            pointer_color=pointer_color,
+            underline_color=underline_color,
+        )
 
         # P1 input
         while p1_hand is None:
             if input_mode == "menu":
-                sel = pick_hand_menu(p1.name, pointer, language)
+                sel = pick_hand_menu(p1.name, ui_ns)
                 if sel is None:
                     console.print("[info]Bye![/]")
                     return 0
@@ -148,7 +157,7 @@ def interactive_loop(
         else:
             while p2_hand is None:
                 if input_mode == "menu":
-                    sel2 = pick_hand_menu(p2.name, pointer, language)
+                    sel2 = pick_hand_menu(p2.name, ui_ns)
                     if sel2 is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -190,15 +199,14 @@ def interactive_loop(
             console.print(f"[info]選択中: [bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
             confirmed = False
             if input_mode == "menu":
-                sel = questionary.select(
+                sel = q_select(
                     "この内容でよろしいですか？" if language != "en" else "Confirm these hands?",
                     choices=[
                         questionary.Choice("決定" if language != "en" else "Confirm", "ok"),
                         questionary.Choice("やり直し" if language != "en" else "Redo", "redo"),
                     ],
+                    ns=ui_ns,
                     default="ok",
-                    pointer=pointer,
-                    instruction=instruction_select(language),
                 ).ask()
                 confirmed = (sel == "ok")
             else:
@@ -213,7 +221,7 @@ def interactive_loop(
             # P1
             while p1_hand is None:
                 if input_mode == "menu":
-                    sel = pick_hand_menu(p1.name, pointer, language)
+                    sel = pick_hand_menu(p1.name, ui_ns)
                     if sel is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -252,7 +260,7 @@ def interactive_loop(
             else:
                 while p2_hand is None:
                     if input_mode == "menu":
-                        sel2 = pick_hand_menu(p2.name, pointer, language)
+                        sel2 = pick_hand_menu(p2.name, ui_ns)
                         if sel2 is None:
                             console.print("[info]Bye![/]")
                             return 0

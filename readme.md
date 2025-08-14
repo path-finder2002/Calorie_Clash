@@ -57,6 +57,9 @@ PYTHONPATH=src python -m calorie_clash --mode 1p  # Windows: $env:PYTHONPATH="sr
     - 入力方式を選択メニュー（questionary）にする
   - カーソル表示（選択）
     - `❯` / `>` / `👉` から選択可
+  - 色設定（選択）
+    - カーソル色（pointer color）
+    - 選択中の下線色（highlight underline color）
 
 ## 仕組み / Architecture
 - コア型/データ: `src/calorie_clash/core/types.py`, `src/calorie_clash/core/data.py`
@@ -80,3 +83,5 @@ MIT License
 - `--anim`: `on` | `off`（ジャン・ケン・ポンのアニメーション表示）
 - `--anim-speed`: アニメ間隔（秒, 既定 1.0）
 - `--pointer`: `tri` | `gt` | `hand`（メニューのカーソル記号: `tri=❯`, `gt=>`, `hand=👉`）
+- `--pointer-color`: `magenta|cyan|green|yellow|blue|white`
+- `--underline-color`: `cyan|magenta|green|yellow|blue|white`
