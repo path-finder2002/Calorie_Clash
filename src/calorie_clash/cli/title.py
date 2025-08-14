@@ -33,11 +33,14 @@ def _rules_menu(ns: argparse.Namespace) -> None:
         ("入力を選択メニューにする（questionary）", "input_menu", input_menu),
         ("アニメーションを有効化（ジャン→ケン→ポン）", "anim_on", anim_on),
     ]
-    selected = q_checkbox(
+    res = q_checkbox(
         "ルール設定（チェックで有効化）",
         choices=[questionary.Choice(label, key, checked=checked) for (label, key, checked) in items],
         ns=ns,
-    ).ask() or []
+    ).ask()
+    if res is None:
+        return  # Esc: cancel without changing settings
+    selected = res
 
     ns.tie = "bothEat" if "tie_both_eat" in selected else "rematch"
     ns.input = "menu" if "input_menu" in selected else "direct"

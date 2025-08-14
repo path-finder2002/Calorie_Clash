@@ -208,6 +208,9 @@ def interactive_loop(
                     ns=ui_ns,
                     default="ok",
                 ).ask()
+                if sel is None:
+                    console.print("[info]Bye![/]")
+                    return 0
                 confirmed = (sel == "ok")
             else:
                 ans = input("確認しますか？ (y/n) [y]: " if language != "en" else "Confirm? (y/n) [y]: ").strip().lower() or "y"

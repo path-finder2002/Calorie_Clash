@@ -15,7 +15,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         ],
         ns=ns,
         default=ns.mode,
-    ).ask() or ns.mode
+    ).ask()
+    if mode is None:
+        return ns  # Esc cancels wizard
 
     # Common: tie rule
     tie = q_select(
@@ -26,7 +28,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         ],
         ns=ns,
         default=ns.tie,
-    ).ask() or ns.tie
+    ).ask()
+    if tie is None:
+        return ns
 
     # Target points
     def _validate_int(val: str):
@@ -47,7 +51,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         ],
         ns=ns,
         default=ns.input,
-    ).ask() or ns.input
+    ).ask()
+    if input_mode is None:
+        return ns
 
     if mode == "1p":
         p1_name = questionary.text("P1 の名前", default=ns.p1_name).ask() or ns.p1_name
@@ -61,7 +67,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
             ],
             ns=ns,
             default=ns.physique,
-        ).ask() or ns.physique
+        ).ask()
+        if physique is None:
+            return ns
         ns.mode, ns.tie, ns.target, ns.input = mode, tie, target, input_mode
         ns.p1_name, ns.p2_name, ns.physique = p1_name, p2_name, physique
         return ns
@@ -77,7 +85,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
             ],
             ns=ns,
             default=ns.physique,
-        ).ask() or ns.physique
+        ).ask()
+        if p1_phys is None:
+            return ns
         p2_phys = q_select(
             "P2 の体格",
             choices=[
@@ -87,7 +97,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
             ],
             ns=ns,
             default=ns.physique,
-        ).ask() or ns.physique
+        ).ask()
+        if p2_phys is None:
+            return ns
         ns.mode, ns.tie, ns.target, ns.input = mode, tie, target, input_mode
         ns.p1_name, ns.p2_name = p1_name, p2_name
         ns.physique = "medium"  # placeholder for 2p
