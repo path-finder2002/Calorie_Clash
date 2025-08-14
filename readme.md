@@ -76,7 +76,7 @@ MIT License
 - `--mode`: `1p` | `2p`
 - `--input`: `direct` | `menu`（questionary）
 - `--target`: 目標ポイント（既定 50）
-- `--physique`: `small` | `medium` | `large`（満腹上限 80/100/130）
+- `--physique`: `small` | `medium` | `large`（満腹上限 800/1000/1300）
 - `--p1-name`, `--p2-name`: プレイヤー名
 - `--tie`: `rematch` | `bothEat`（あいこ時の挙動）
 - `--wizard`: 起動時にセットアップウィザードを実行

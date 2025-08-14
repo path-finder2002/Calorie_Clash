@@ -61,9 +61,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         physique = q_select(
             "体格（容量プリセット）",
             choices=[
-                questionary.Choice("small (80)", "small"),
-                questionary.Choice("medium (100)", "medium"),
-                questionary.Choice("large (130)", "large"),
+                questionary.Choice("small (800)", "small"),
+                questionary.Choice("medium (1000)", "medium"),
+                questionary.Choice("large (1300)", "large"),
             ],
             ns=ns,
             default=ns.physique,
@@ -79,9 +79,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         p1_phys = q_select(
             "P1 の体格",
             choices=[
-                questionary.Choice("small (80)", "small"),
-                questionary.Choice("medium (100)", "medium"),
-                questionary.Choice("large (130)", "large"),
+                questionary.Choice("small (800)", "small"),
+                questionary.Choice("medium (1000)", "medium"),
+                questionary.Choice("large (1300)", "large"),
             ],
             ns=ns,
             default=ns.physique,
@@ -91,9 +91,9 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         p2_phys = q_select(
             "P2 の体格",
             choices=[
-                questionary.Choice("small (80)", "small"),
-                questionary.Choice("medium (100)", "medium"),
-                questionary.Choice("large (130)", "large"),
+                questionary.Choice("small (800)", "small"),
+                questionary.Choice("medium (1000)", "medium"),
+                questionary.Choice("large (1300)", "large"),
             ],
             ns=ns,
             default=ns.physique,

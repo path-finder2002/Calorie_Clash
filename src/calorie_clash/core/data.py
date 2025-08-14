@@ -24,8 +24,7 @@ DEFAULT_FOODS: Dict[Hand, List[Food]] = {
 }
 
 PHYSIQUE_CAPACITY = {
-    "small": 80,
-    "medium": 100,
-    "large": 130,
+    "small": 800,
+    "medium": 1000,
+    "large": 1300,
 }
-
