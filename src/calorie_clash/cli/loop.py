@@ -336,7 +336,7 @@ def interactive_loop(
         else:
             while p2_hand is None:
                 if input_mode == "menu":
-                    sel2 = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p2.name, ui_ns)
+                    sel2 = pick_hand_menu_secure(p2.name, ui_ns)
                     if sel2 is None:
                         console.print("[info]Bye![/]")
                         return 0
