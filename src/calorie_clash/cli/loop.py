@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import questionary
-from random import choice
+from random import choice, sample
 from time import sleep
 from typing import Optional
 
@@ -76,6 +76,39 @@ def pick_hand_menu(player_name: str, ns) -> Optional[Hand]:
     return sel  # Hand
 
 
+def pick_hand_menu_secure(player_name: str, ns) -> Optional[Hand]:
+    # Build a randomized masked menu for hands
+    order = sample([Hand.ROCK, Hand.SCISSORS, Hand.PAPER], k=3)
+    label_map = {
+        order[0]: "🔒 選択肢 1",
+        order[1]: "🔒 選択肢 2",
+        order[2]: "🔒 選択肢 3",
+    }
+    choices = [
+        questionary.Choice(label_map[h], h) for h in order
+    ] + [
+        questionary.Separator(" "),
+        questionary.Choice("— ステータスを表示 —", "status"),
+        questionary.Separator(" "),
+        questionary.Choice("— ルールを表示 —", "rules"),
+        questionary.Separator(" "),
+        questionary.Choice("— 終了 —", "quit"),
+    ]
+    sel = q_select(
+        f"{player_name} の手を選んでください",
+        choices=choices,
+        ns=ns,
+    ).ask()
+    if sel is None:
+        return None
+    if sel == "status":
+        return "status"  # type: ignore[return-value]
+    if sel == "rules":
+        return "rules"  # type: ignore[return-value]
+    if sel == "quit":
+        return "quit"  # type: ignore[return-value]
+    return sel  # Hand
+
 EMOJI = {
     Hand.ROCK: "✊",
     Hand.SCISSORS: "✌️",
@@ -128,6 +161,7 @@ def interactive_loop(
     pointer_color: str = "magenta",
     underline_color: str = "cyan",
     foods=None,
+    secure_select: bool = False,
 ) -> int:
     console.line()
     console.print("[rule]コマンド: :help / :status / :rules / :quit[/rule]")
@@ -157,7 +191,7 @@ def interactive_loop(
         # P1 input
         while p1_hand is None:
             if input_mode == "menu":
-                sel = pick_hand_menu(p1.name, ui_ns)
+                sel = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p1.name, ui_ns)
                 if sel is None:
                     console.print("[info]Bye![/]")
                     return 0
@@ -235,7 +269,7 @@ def interactive_loop(
         else:
             while p2_hand is None:
                 if input_mode == "menu":
-                    sel2 = pick_hand_menu(p2.name, ui_ns)
+                    sel2 = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p2.name, ui_ns)
                     if sel2 is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -330,7 +364,7 @@ def interactive_loop(
             # P1
             while p1_hand is None:
                 if input_mode == "menu":
-                    sel = pick_hand_menu(p1.name, ui_ns)
+                    sel = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p1.name, ui_ns)
                     if sel is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -375,7 +409,7 @@ def interactive_loop(
             else:
                 while p2_hand is None:
                     if input_mode == "menu":
-                        sel2 = pick_hand_menu(p2.name, ui_ns)
+                        sel2 = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p2.name, ui_ns)
                         if sel2 is None:
                             console.print("[info]Bye![/]")
                             return 0

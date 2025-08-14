@@ -36,6 +36,7 @@ def q_select(message: str, choices: Sequence, ns, **kwargs: Any):
     ptr = pointer_symbol(getattr(ns, "pointer", "tri"))
     lang = getattr(ns, "language", "ja")
     kwargs.setdefault("instruction", instruction_select(lang))
+    kwargs.setdefault("show_selected", False)
     # Build style with pointer color and underline color
     pcolor = getattr(ns, "pointer_color", "magenta")
     ucolor = getattr(ns, "underline_color", "cyan")

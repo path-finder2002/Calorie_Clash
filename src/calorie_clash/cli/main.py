@@ -62,6 +62,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         default="extend",
         help="How to apply foods CSV (extend defaults or replace)",
     )
+    parser.add_argument(
+        "--secure-select",
+        action="store_true",
+        help="Hide actual hand labels in menu (use masked options with random mapping)",
+    )
     return parser.parse_args(argv)
 
 
@@ -130,6 +135,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         pointer_color=getattr(ns, "pointer_color", "magenta"),
         underline_color=getattr(ns, "underline_color", "cyan"),
         foods=foods,
+        secure_select=getattr(ns, "secure_select", False),
     )
 
 

@@ -34,6 +34,7 @@ def _rules_menu(ns: argparse.Namespace) -> None:
         ("あいこ時に両者が食べる（bothEat）", "tie_both_eat", tie),
         ("入力を選択メニューにする（questionary）", "input_menu", input_menu),
         ("アニメーションを有効化（ジャン→ケン→ポン）", "anim_on", anim_on),
+        ("手の選択を暗号化（secure）", "secure_select", getattr(ns, "secure_select", False)),
     ]
     res = q_checkbox(
         "ルール設定（チェックで有効化）",
@@ -47,6 +48,7 @@ def _rules_menu(ns: argparse.Namespace) -> None:
     ns.tie = "bothEat" if "tie_both_eat" in selected else "rematch"
     ns.input = "menu" if "input_menu" in selected else "direct"
     ns.anim = "on" if "anim_on" in selected else "off"
+    ns.secure_select = ("secure_select" in selected)
 
     # Speed prompt when animation is on
     if ns.anim == "on":
