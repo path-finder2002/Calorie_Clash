@@ -5,7 +5,7 @@ from random import choice, sample
 from time import sleep
 from typing import Optional
 
-from ..core.engine import is_game_over, play_round
+from ..core.engine import is_game_over, play_round, pick_food_for
 from ..core.types import Hand, Player, RoundResult, Rules
 from .console import console, gauge_bar
 from rich.table import Table
@@ -201,6 +201,27 @@ def interactive_loop(
     while True:
         console.print(f"[rule]--- Round {round_no} ---[/rule]")
         console.line()
+        # Preselect foods for this round and log them alongside round count
+        selected_foods = {
+            Hand.ROCK: (pick_food_for(Hand.ROCK, foods) if foods is not None else pick_food_for(Hand.ROCK)),
+            Hand.SCISSORS: (pick_food_for(Hand.SCISSORS, foods) if foods is not None else pick_food_for(Hand.SCISSORS)),
+            Hand.PAPER: (pick_food_for(Hand.PAPER, foods) if foods is not None else pick_food_for(Hand.PAPER)),
+        }
+        if language != "en":
+            console.print(
+                "[info]今ラウンドの抽選フード: "
+                f"✊={selected_foods[Hand.ROCK].name}({selected_foods[Hand.ROCK].kcal}kcal), "
+                f"✌️={selected_foods[Hand.SCISSORS].name}({selected_foods[Hand.SCISSORS].kcal}kcal), "
+                f"✋={selected_foods[Hand.PAPER].name}({selected_foods[Hand.PAPER].kcal}kcal)"
+            )
+        else:
+            console.print(
+                "[info]This round food lottery: "
+                f"✊={selected_foods[Hand.ROCK].name}({selected_foods[Hand.ROCK].kcal}kcal), "
+                f"✌️={selected_foods[Hand.SCISSORS].name}({selected_foods[Hand.SCISSORS].kcal}kcal), "
+                f"✋={selected_foods[Hand.PAPER].name}({selected_foods[Hand.PAPER].kcal}kcal)"
+            )
+        console.line()
         p1_hand: Optional[Hand] = None
         p2_hand: Optional[Hand] = None
         p1_commit: Optional[tuple[str, str]] = None  # (hash, nonce)
@@ -391,6 +412,14 @@ def interactive_loop(
                             continue
                         console.print("[warning]無効な入力です。 g/c/p または :help を入力してください。[/]")
 
+        # Ensure commitments exist before confirmation (for direct-input branches)
+        if p1_hand is not None and p1_commit is None:
+            p1_commit = _commit_for(p1.name, p1_hand)
+            console.print(f"[info]{p1.name} のコミットメント: {p1_commit[0][:12]}…[/]" if language != "en" else f"[info]{p1.name} commitment: {p1_commit[0][:12]}…[/]")
+        if p2_hand is not None and p2_commit is None:
+            p2_commit = _commit_for(p2.name, p2_hand)
+            console.print(f"[info]{p2.name} のコミットメント: {p2_commit[0][:12]}…[/]" if language != "en" else f"[info]{p2.name} commitment: {p2_commit[0][:12]}…[/]")
+
         # Confirm then animate Janken
         def show(h: Hand) -> str:
             return _hand_label(h, language)
@@ -427,6 +456,8 @@ def interactive_loop(
             # re-pick both hands
             p1_hand = None
             p2_hand = None
+            p1_commit = None
+            p2_commit = None
             # restart loop for this round
             # P1
             while p1_hand is None:
@@ -530,10 +561,10 @@ def interactive_loop(
 
         console.line()
         console.print(f"[bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
-        if foods is not None:
-            result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules, foods)
-        else:
-            result = play_round(p1, p2, p1_hand, p2_hand, rules)
+        # Force play_round to use the preselected foods by passing
+        # a foods map that contains only the chosen item per hand.
+        forced_foods = {h: [f] for h, f in selected_foods.items()}
+        result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules, forced_foods)
         # Delay result log for readability
         sleep(1)
         if result.tie:
