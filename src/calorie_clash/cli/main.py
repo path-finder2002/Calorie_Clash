@@ -55,7 +55,13 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         default="cyan",
         help="Underline color for highlighted selection",
     )
-    parser.add_argument("--foods-csv", default=None, help="Foods CSV path (hand,name,kcal)")
+    parser.add_argument("--foods-csv", default=None, help="Foods CSV path (hand,name,kcal[,points])")
+    parser.add_argument(
+        "--foods-mode",
+        choices=["extend", "replace"],
+        default="extend",
+        help="How to apply foods CSV (extend defaults or replace)",
+    )
     return parser.parse_args(argv)
 
 
@@ -106,7 +112,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         foods = getattr(ns, "_foods")
     elif getattr(ns, "foods_csv", None):
         try:
-            foods = load_foods_csv(ns.foods_csv)
+            foods = load_foods_csv(ns.foods_csv, extend_from_defaults=(ns.foods_mode == "extend"))
             console.print(f"[info]Foods CSV loaded: {ns.foods_csv}[/]")
         except Exception as e:
             console.print(f"[warning]Foods CSV load failed: {e}[/]")

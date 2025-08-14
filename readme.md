@@ -61,7 +61,9 @@ PYTHONPATH=src python -m calorie_clash --mode 1p  # Windows: $env:PYTHONPATH="sr
     - カーソル色（pointer color）
     - 選択中の下線色（highlight underline color）
   - 食べ物CSVの読み込み
-     - `hand,name,kcal` のCSVを読み込み、デフォルトの食べ物リストに追加（拡張）
+     - `hand,name,kcal[,points]` のCSVを読み込み
+     - 適用方法を選択: 既定に追加（extend）/ 既定を置換（replace）
+     - points 列があればポイント計算を上書き（無い場合は名前長×2）
 
 ## 仕組み / Architecture
 - コア型/データ: `src/calorie_clash/core/types.py`, `src/calorie_clash/core/data.py`
@@ -87,4 +89,5 @@ MIT License
 - `--pointer`: `tri` | `gt` | `hand`（メニューのカーソル記号: `tri=❯`, `gt=>`, `hand=👉`）
 - `--pointer-color`: `magenta|cyan|green|yellow|blue|white`
 - `--underline-color`: `cyan|magenta|green|yellow|blue|white`
-- `--foods-csv`: 食べ物CSVのパス（`hand,name,kcal`）
+- `--foods-csv`: 食べ物CSVのパス（`hand,name,kcal[,points]`）
+- `--foods-mode`: `extend` | `replace`（CSVの適用方法）

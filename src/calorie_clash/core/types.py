@@ -26,10 +26,13 @@ class Hand(Enum):
 class Food:
     name: str
     kcal: int
+    custom_points: Optional[int] = None
 
     @property
     def points(self) -> int:
-        # Simple scoring: length of the name (non-space) times 2
+        # Optional override via CSV; otherwise length-based score times 2
+        if self.custom_points is not None:
+            return max(0, int(self.custom_points))
         return max(1, len(self.name.replace(" ", ""))) * 2
 
 
@@ -59,4 +62,3 @@ class RoundResult:
     winner_food: Optional[Food]
     loser_added_kcal: int
     winner_gained_points: int
-

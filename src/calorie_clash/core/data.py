@@ -72,9 +72,12 @@ def load_foods_csv(path: str, *, extend_from_defaults: bool = True) -> Dict[Hand
     result: Dict[Hand, List[Food]] = {h: (list(DEFAULT_FOODS[h]) if extend_from_defaults else []) for h in Hand}
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
+        # Normalize headers to lower
+        headers = [h.strip().lower() for h in (reader.fieldnames or [])]
         required = {"hand", "name", "kcal"}
-        if not required.issubset(set(h.strip().lower() for h in reader.fieldnames or [])):
+        if not required.issubset(set(headers)):
             raise ValueError("CSV must include columns: hand,name,kcal")
+        has_points = "points" in set(headers)
         for row in reader:
             hand = parse_hand_token(row.get("hand", ""))
             name = (row.get("name", "") or "").strip()
@@ -85,5 +88,13 @@ def load_foods_csv(path: str, *, extend_from_defaults: bool = True) -> Dict[Hand
                 kcal = int(float(kcal_s))
             except Exception:
                 continue
-            result[hand].append(Food(name=name, kcal=kcal))
+            custom_pts = None
+            if has_points:
+                pts_s = (row.get("points", "") or "").strip()
+                if pts_s:
+                    try:
+                        custom_pts = int(float(pts_s))
+                    except Exception:
+                        custom_pts = None
+            result[hand].append(Food(name=name, kcal=kcal, custom_points=custom_pts))
     return result

@@ -179,11 +179,23 @@ def _foods_menu(ns: argparse.Namespace) -> None:
     if not os.path.isfile(path):
         console.print(f"[warning]ファイルが見つかりません: {path}[/]")
         return
+    mode = q_select(
+        "適用方法 / Apply Mode",
+        choices=[
+            questionary.Choice("既定に追加（extend）", "extend"),
+            questionary.Choice("既定を置換（replace）", "replace"),
+        ],
+        ns=ns,
+        default=getattr(ns, "foods_mode", "extend"),
+    ).ask()
+    if mode is None:
+        return
     try:
-        foods = load_foods_csv(path)
+        foods = load_foods_csv(path, extend_from_defaults=(mode == "extend"))
     except Exception as e:
         console.print(f"[warning]CSV の読み込みに失敗しました: {e}[/]")
         return
     setattr(ns, "foods_csv", path)
+    setattr(ns, "foods_mode", mode)
     setattr(ns, "_foods", foods)
     console.print(f"[info]食べ物CSVを読み込みました: {path}[/]")
