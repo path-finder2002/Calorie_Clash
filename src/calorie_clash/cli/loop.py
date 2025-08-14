@@ -3,6 +3,8 @@ from __future__ import annotations
 import questionary
 from random import choice
 from time import sleep
+import hashlib
+from secrets import token_hex
 from typing import Optional
 
 from ..core.engine import is_game_over, play_round
@@ -92,6 +94,18 @@ def _hand_label(hand: Hand, lang: str) -> str:
     return f"{names[hand]} {EMOJI[hand]}"
 
 
+def _commit_for(name: str, hand: Hand) -> tuple[str, str]:
+    """Create a commitment for (name, hand) using a random nonce.
+
+    Returns (commit_hex, nonce). Hash = sha256(nonce + name + ':' + hand_key)
+    """
+    nonce = token_hex(8)
+    hand_key = {Hand.ROCK: "ROCK", Hand.SCISSORS: "SCISSORS", Hand.PAPER: "PAPER"}[hand]
+    payload = f"{nonce}{name}:{hand_key}".encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    return digest, nonce
+
+
 def interactive_loop(
     p1: Player,
     p2: Player,
@@ -115,6 +129,8 @@ def interactive_loop(
         console.line()
         p1_hand: Optional[Hand] = None
         p2_hand: Optional[Hand] = None
+        p1_commit: Optional[tuple[str, str]] = None  # (hash, nonce)
+        p2_commit: Optional[tuple[str, str]] = None
         pointer = pointer_symbol(pointer_code)
         # namespace object for UI helpers
         from types import SimpleNamespace
@@ -139,10 +155,28 @@ def interactive_loop(
                     print_rules(rules)
                     continue
                 p1_hand = sel  # type: ignore[assignment]
+                if mode == "2p":
+                    p1_commit = _commit_for(p1.name, p1_hand)
+                    ch = p1_commit[0][:12]
+                    msg = (
+                        f"[info]{p1.name} のコミットメント: {ch}…[/]"
+                        if language != "en"
+                        else f"[info]{p1.name} commitment: {ch}…[/]"
+                    )
+                    console.print(msg)
             else:
                 h = prompt_hand(p1.name)
                 if h is not None:
                     p1_hand = h
+                    if mode == "2p":
+                        p1_commit = _commit_for(p1.name, p1_hand)
+                        ch = p1_commit[0][:12]
+                        msg = (
+                            f"[info]{p1.name} のコミットメント: {ch}…[/]"
+                            if language != "en"
+                            else f"[info]{p1.name} commitment: {ch}…[/]"
+                        )
+                        console.print(msg)
                     break
                 # command handling (direct mode)
                 raw = input(":command> ").strip().lower()
@@ -167,6 +201,15 @@ def interactive_loop(
         if mode == "1p":
             p2_hand = cpu_pick()
             console.print(f"[info]{p2.name} は手を選びました。[/]")
+            # CPU commitment (revealed later)
+            p2_commit = _commit_for(p2.name, p2_hand)
+            ch = p2_commit[0][:12]
+            msg = (
+                f"[info]{p2.name} のコミットメント: {ch}…（後で公開）[/]"
+                if language != "en"
+                else f"[info]{p2.name} commitment: {ch}… (salt revealed later)"
+            )
+            console.print(msg)
         else:
             while p2_hand is None:
                 if input_mode == "menu":
@@ -181,6 +224,14 @@ def interactive_loop(
                         print_rules(rules)
                         continue
                     p2_hand = sel2  # type: ignore[assignment]
+                    p2_commit = _commit_for(p2.name, p2_hand)
+                    ch = p2_commit[0][:12]
+                    msg = (
+                        f"[info]{p2.name} のコミットメント: {ch}…[/]"
+                        if language != "en"
+                        else f"[info]{p2.name} commitment: {ch}…[/]"
+                    )
+                    console.print(msg)
                 else:
                     p2_hand = prompt_hand(p2.name)
                     if p2_hand is None:
@@ -350,6 +401,15 @@ def interactive_loop(
                 f"{result.winner.name}の勝ち！" if language != "en" else f"{result.winner.name} wins!"
             )
             console.print(f"[success]{winline}[/]")
+        # Reveal salts
+        if mode == "2p":
+            if p1_commit:
+                console.print(f"[rule]{p1.name} salt: {p1_commit[1]}[/]")
+            if p2_commit:
+                console.print(f"[rule]{p2.name} salt: {p2_commit[1]}[/]")
+        else:
+            if p2_commit:
+                console.print(f"[rule]{p2.name} salt: {p2_commit[1]}[/]")
         console.line()
         # Delay status gauge output for readability
         sleep(1)
