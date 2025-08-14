@@ -219,7 +219,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     anim_enabled = (ns.anim == "on")
     anim_interval = max(0.0, float(ns.anim_speed))
-    return interactive_loop(p1, p2, rules, ns.mode, ns.input, anim_enabled, anim_interval)
+    language = getattr(ns, "language", "ja")
+    return interactive_loop(p1, p2, rules, ns.mode, ns.input, anim_enabled, anim_interval, language)
 
 
 if __name__ == "__main__":

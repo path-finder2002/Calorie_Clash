@@ -61,6 +61,21 @@ def pick_hand_menu(player_name: str) -> Optional[Hand]:
     return sel  # Hand
 
 
+EMOJI = {
+    Hand.ROCK: "✊",
+    Hand.SCISSORS: "✌️",
+    Hand.PAPER: "✋",
+}
+
+
+def _hand_label(hand: Hand, lang: str) -> str:
+    if lang == "en":
+        names = {Hand.ROCK: "Rock", Hand.SCISSORS: "Scissors", Hand.PAPER: "Paper"}
+    else:
+        names = {Hand.ROCK: "グー", Hand.SCISSORS: "チョキ", Hand.PAPER: "パー"}
+    return f"{names[hand]} {EMOJI[hand]}"
+
+
 def interactive_loop(
     p1: Player,
     p2: Player,
@@ -69,6 +84,7 @@ def interactive_loop(
     input_mode: str,
     anim_enabled: bool = True,
     anim_interval: float = 1.0,
+    language: str = "ja",
 ) -> int:
     console.print("\n[rule]コマンド: :help / :status / :rules / :quit[/rule]")
     round_no = 1
@@ -158,23 +174,23 @@ def interactive_loop(
 
         # Confirm then animate Janken
         def show(h: Hand) -> str:
-            return {Hand.ROCK: "グー", Hand.SCISSORS: "チョキ", Hand.PAPER: "パー"}[h]
+            return _hand_label(h, language)
         # Confirmation step
         while True:
             console.print(f"[info]選択中: [bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
             confirmed = False
             if input_mode == "menu":
                 sel = questionary.select(
-                    "この内容でよろしいですか？",
+                    "この内容でよろしいですか？" if language != "en" else "Confirm these hands?",
                     choices=[
-                        questionary.Choice("決定", "ok"),
-                        questionary.Choice("やり直し", "redo"),
+                        questionary.Choice("決定" if language != "en" else "Confirm", "ok"),
+                        questionary.Choice("やり直し" if language != "en" else "Redo", "redo"),
                     ],
                     default="ok",
                 ).ask()
                 confirmed = (sel == "ok")
             else:
-                ans = input("確認しますか？ (y/n) [y]: ").strip().lower() or "y"
+                ans = input("確認しますか？ (y/n) [y]: " if language != "en" else "Confirm? (y/n) [y]: ").strip().lower() or "y"
                 confirmed = ans in {"y", "yes"}
             if confirmed:
                 break
@@ -260,24 +276,31 @@ def interactive_loop(
 
         # Janken animation (configurable interval): ジャン -> ケン -> ポン！
         if anim_enabled:
-            console.print("[info]ジャン…[/]")
+            console.print("[info]ジャン…[/]" if language != "en" else "[info]Jan…[/]")
             sleep(anim_interval)
-            console.print("[info]ケン…[/]")
+            console.print("[info]ケン…[/]" if language != "en" else "[info]Ken…[/]")
             sleep(anim_interval)
-            console.print("[title]ポン！[/]")
+            console.print("[title]ポン！[/]" if language != "en" else "[title]Pon![/]")
             sleep(0.2)
         else:
-            console.print("[title]ポン！[/]")
+            console.print("[title]ポン！[/]" if language != "en" else "[title]Pon![/]")
 
         console.print(f"\n[bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
         result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules)
         if result.tie:
-            console.print("[warning]勝敗判定: あいこ[/]")
+            console.print("[tie]勝敗判定: あいこ[/]" if language != "en" else "[tie]Result: Tie[/]")
         else:
             assert result.winner and result.winner_food
             console.print(
-                f"[success]勝敗判定: 勝者 {result.winner.name}[/] (+{result.winner_gained_points}pt) "
-                f"/ 敗者は『{result.winner_food.name}』を食べて +{result.loser_added_kcal}kcal"
+                (
+                    f"[success]勝敗判定: 勝者 {result.winner.name}[/] (+[success]{result.winner_gained_points}pt[/]) "
+                    f"/ 敗者は『{result.winner_food.name}』を食べて [error]+{result.loser_added_kcal}kcal[/]"
+                )
+                if language != "en"
+                else (
+                    f"[success]Result: Winner {result.winner.name}[/] (+[success]{result.winner_gained_points}pt[/]) "
+                    f"/ Loser eats '{result.winner_food.name}' [error]+{result.loser_added_kcal}kcal[/]"
+                )
             )
         print_status(p1, p2, rules)
 

@@ -11,10 +11,10 @@ _theme = Theme(
         "warning": "bold yellow",
         "error": "bold red",
         "info": "cyan",
+        "tie": "bold blue",
         "rule": "dim",
     }
 )
 
 
 console = Console(theme=_theme)
-
