@@ -101,6 +101,7 @@ def interactive_loop(
     pointer_code: str = "tri",
     pointer_color: str = "magenta",
     underline_color: str = "cyan",
+    foods=None,
 ) -> int:
     console.line()
     console.print("[rule]コマンド: :help / :status / :rules / :quit[/rule]")
@@ -320,7 +321,10 @@ def interactive_loop(
 
         console.line()
         console.print(f"[bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
-        result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules)
+        if foods is not None:
+            result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules, foods)
+        else:
+            result = play_round(p1, p2, p1_hand, p2_hand, rules)
         if result.tie:
             console.print("[tie]勝敗判定: あいこ[/]" if language != "en" else "[tie]Result: Tie[/]")
         else:

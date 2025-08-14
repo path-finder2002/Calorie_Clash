@@ -3,9 +3,11 @@ from __future__ import annotations
 import argparse
 import questionary
 
+import os
 from .wizard import run_setup_wizard
 from .console import console
 from .ui import pointer_symbol, q_select, q_checkbox, instruction_select, instruction_checkbox
+from ..core.data import load_foods_csv
 
 
 def _language_menu(ns: argparse.Namespace) -> None:
@@ -71,6 +73,7 @@ def _options_menu(ns: argparse.Namespace) -> None:
                 questionary.Choice("言語設定 / Language", "lang"),
                 questionary.Choice("ルール設定 / Rules", "rules"),
                 questionary.Choice("カーソル表示 / Cursor", "cursor"),
+                questionary.Choice("食べ物CSV / Foods CSV", "foods"),
                 questionary.Choice("色設定 / Colors", "colors"),
                 questionary.Choice("戻る / Back", "back"),
             ],
@@ -86,6 +89,8 @@ def _options_menu(ns: argparse.Namespace) -> None:
             _cursor_menu(ns)
         elif choice == "colors":
             _colors_menu(ns)
+        elif choice == "foods":
+            _foods_menu(ns)
 
 
 def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
@@ -161,3 +166,24 @@ def _colors_menu(ns: argparse.Namespace) -> None:
     ).ask()
     if ul_color:
         setattr(ns, "underline_color", ul_color)
+
+
+def _foods_menu(ns: argparse.Namespace) -> None:
+    # Prompt for CSV path and try to load
+    default_path = getattr(ns, "foods_csv", "") or "foods.csv"
+    path = questionary.text(
+        "CSV パスを入力してください (hand,name,kcal)", default=default_path
+    ).ask()
+    if not path:
+        return
+    if not os.path.isfile(path):
+        console.print(f"[warning]ファイルが見つかりません: {path}[/]")
+        return
+    try:
+        foods = load_foods_csv(path)
+    except Exception as e:
+        console.print(f"[warning]CSV の読み込みに失敗しました: {e}[/]")
+        return
+    setattr(ns, "foods_csv", path)
+    setattr(ns, "_foods", foods)
+    console.print(f"[info]食べ物CSVを読み込みました: {path}[/]")

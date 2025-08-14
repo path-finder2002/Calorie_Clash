@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from random import choice
 from typing import Optional
 
-from ..core.data import PHYSIQUE_CAPACITY
+from ..core.data import PHYSIQUE_CAPACITY, load_foods_csv
 from ..core.types import Rules, Player
 from .wizard import run_setup_wizard
 from .title import title_screen
@@ -55,6 +55,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         default="cyan",
         help="Underline color for highlighted selection",
     )
+    parser.add_argument("--foods-csv", default=None, help="Foods CSV path (hand,name,kcal)")
     return parser.parse_args(argv)
 
 
@@ -99,6 +100,17 @@ def main(argv: Optional[list[str]] = None) -> int:
     anim_enabled = (ns.anim == "on")
     anim_interval = max(0.0, float(ns.anim_speed))
     language = getattr(ns, "language", "ja")
+    # Load foods from options or CLI if provided
+    foods = None
+    if hasattr(ns, "_foods"):
+        foods = getattr(ns, "_foods")
+    elif getattr(ns, "foods_csv", None):
+        try:
+            foods = load_foods_csv(ns.foods_csv)
+            console.print(f"[info]Foods CSV loaded: {ns.foods_csv}[/]")
+        except Exception as e:
+            console.print(f"[warning]Foods CSV load failed: {e}[/]")
+
     return interactive_loop(
         p1,
         p2,
@@ -109,6 +121,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         anim_interval,
         language,
         pointer_code=getattr(ns, "pointer", "tri"),
+        pointer_color=getattr(ns, "pointer_color", "magenta"),
+        underline_color=getattr(ns, "underline_color", "cyan"),
+        foods=foods,
     )
 
 
