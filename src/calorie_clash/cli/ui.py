@@ -18,17 +18,17 @@ def pointer_symbol(code: str | None) -> str:
 
 def instruction_select(language: str) -> str:
     return (
-        "\n↑/↓: 移動 • Enter: 決定 • Esc: キャンセル\n"
+        "\n↑/↓: 移動 • Enter: 決定 • ^C: キャンセル\n"
         if language != "en"
-        else "\n↑/↓: Move • Enter: Select • Esc: Cancel\n"
+        else "\n↑/↓: Move • Enter: Select • ^C: Cancel\n"
     )
 
 
 def instruction_checkbox(language: str) -> str:
     return (
-        "\n↑/↓: 移動 • Space: 切替 • Enter: 確定 • Esc: キャンセル\n"
+        "\n↑/↓: 移動 • Space: 切替 • Enter: 確定 • ^C: キャンセル\n"
         if language != "en"
-        else "\n↑/↓: Move • Space: Toggle • Enter: Apply • Esc: Cancel\n"
+        else "\n↑/↓: Move • Space: Toggle • Enter: Apply • ^C: Cancel\n"
     )
 
 
