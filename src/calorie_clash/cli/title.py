@@ -23,11 +23,13 @@ def _language_menu(ns: argparse.Namespace) -> None:
 
 def _rules_menu(ns: argparse.Namespace) -> None:
     # Build checkbox list from current settings
-    tie = (ns.tie == "bothEat")
-    input_menu = (ns.input == "menu")
+    tie = (getattr(ns, "tie", "rematch") == "bothEat")
+    input_menu = (getattr(ns, "input", "direct") == "menu")
+    anim_on = (getattr(ns, "anim", "on") == "on")
     items = [
         ("あいこ時に両者が食べる（bothEat）", "tie_both_eat", tie),
         ("入力を選択メニューにする（questionary）", "input_menu", input_menu),
+        ("アニメーションを有効化（ジャン→ケン→ポン）", "anim_on", anim_on),
     ]
     selected = questionary.checkbox(
         "ルール設定（チェックで有効化）",
@@ -36,6 +38,23 @@ def _rules_menu(ns: argparse.Namespace) -> None:
 
     ns.tie = "bothEat" if "tie_both_eat" in selected else "rematch"
     ns.input = "menu" if "input_menu" in selected else "direct"
+    ns.anim = "on" if "anim_on" in selected else "off"
+
+    # Speed prompt when animation is on
+    if ns.anim == "on":
+        def _validate_float(val: str):
+            try:
+                v = float(val)
+                return v >= 0 or "0以上の数値を入力してください"
+            except Exception:
+                return "数値を入力してください"
+        current = str(getattr(ns, "anim_speed", 1.0))
+        speed = questionary.text("アニメ間隔（秒）", default=current, validate=_validate_float).ask()
+        if speed:
+            try:
+                ns.anim_speed = float(speed)
+            except Exception:
+                pass
 
 
 def _options_menu(ns: argparse.Namespace) -> None:

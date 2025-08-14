@@ -61,7 +61,15 @@ def pick_hand_menu(player_name: str) -> Optional[Hand]:
     return sel  # Hand
 
 
-def interactive_loop(p1: Player, p2: Player, rules: Rules, mode: str, input_mode: str) -> int:
+def interactive_loop(
+    p1: Player,
+    p2: Player,
+    rules: Rules,
+    mode: str,
+    input_mode: str,
+    anim_enabled: bool = True,
+    anim_interval: float = 1.0,
+) -> int:
     console.print("\n[rule]コマンド: :help / :status / :rules / :quit[/rule]")
     round_no = 1
     while True:
@@ -250,13 +258,16 @@ def interactive_loop(p1: Player, p2: Player, rules: Rules, mode: str, input_mode
                                 continue
                             console.print("[warning]無効な入力です。 g/c/p または :help を入力してください。[/]")
 
-        # Janken animation (1s interval): ジャン -> ケン -> ポン！
-        console.print("[info]ジャン…[/]")
-        sleep(1)
-        console.print("[info]ケン…[/]")
-        sleep(1)
-        console.print("[title]ポン！[/]")
-        sleep(0.2)
+        # Janken animation (configurable interval): ジャン -> ケン -> ポン！
+        if anim_enabled:
+            console.print("[info]ジャン…[/]")
+            sleep(anim_interval)
+            console.print("[info]ケン…[/]")
+            sleep(anim_interval)
+            console.print("[title]ポン！[/]")
+            sleep(0.2)
+        else:
+            console.print("[title]ポン！[/]")
 
         console.print(f"\n[bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
         result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules)

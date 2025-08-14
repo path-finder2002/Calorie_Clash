@@ -35,6 +35,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--p2-name", default="CPU", help="Player 2 name")
     parser.add_argument("--tie", choices=["rematch", "bothEat"], default="rematch", help="Tie rule")
     parser.add_argument("--wizard", action="store_true", help="Launch interactive setup wizard (questionary)")
+    parser.add_argument("--anim", choices=["on", "off"], default="on", help="Enable/disable janken animation")
+    parser.add_argument("--anim-speed", type=float, default=1.0, help="Seconds between ジャン→ケン→ポン (default 1.0)")
     return parser.parse_args(argv)
 
 
@@ -215,7 +217,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     print_rules(rules)
     print_status(p1, p2, rules)
 
-    return interactive_loop(p1, p2, rules, ns.mode, ns.input)
+    anim_enabled = (ns.anim == "on")
+    anim_interval = max(0.0, float(ns.anim_speed))
+    return interactive_loop(p1, p2, rules, ns.mode, ns.input, anim_enabled, anim_interval)
 
 
 if __name__ == "__main__":

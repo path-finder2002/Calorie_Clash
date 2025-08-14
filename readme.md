@@ -71,3 +71,5 @@ MIT License
 - `--p1-name`, `--p2-name`: プレイヤー名
 - `--tie`: `rematch` | `bothEat`（あいこ時の挙動）
 - `--wizard`: 起動時にセットアップウィザードを実行
+- `--anim`: `on` | `off`（ジャン・ケン・ポンのアニメーション表示）
+- `--anim-speed`: アニメ間隔（秒, 既定 1.0）
