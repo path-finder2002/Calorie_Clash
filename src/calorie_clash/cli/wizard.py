@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import questionary
-from .ui import pointer_symbol
+from .ui import pointer_symbol, instruction_select
 
 
 def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
@@ -15,6 +15,7 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         ],
         default=ns.mode,
         pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask() or ns.mode
 
     # Common: tie rule
@@ -26,6 +27,7 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         ],
         default=ns.tie,
         pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask() or ns.tie
 
     # Target points
@@ -47,6 +49,7 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
         ],
         default=ns.input,
         pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask() or ns.input
 
     if mode == "1p":
@@ -61,6 +64,7 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
             ],
             default=ns.physique,
             pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+            instruction=instruction_select(getattr(ns, "language", "ja")),
         ).ask() or ns.physique
         ns.mode, ns.tie, ns.target, ns.input = mode, tie, target, input_mode
         ns.p1_name, ns.p2_name, ns.physique = p1_name, p2_name, physique
@@ -77,6 +81,7 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
             ],
             default=ns.physique,
             pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+            instruction=instruction_select(getattr(ns, "language", "ja")),
         ).ask() or ns.physique
         p2_phys = questionary.select(
             "P2 の体格",
@@ -87,6 +92,7 @@ def run_setup_wizard(ns: argparse.Namespace) -> argparse.Namespace:
             ],
             default=ns.physique,
             pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+            instruction=instruction_select(getattr(ns, "language", "ja")),
         ).ask() or ns.physique
         ns.mode, ns.tie, ns.target, ns.input = mode, tie, target, input_mode
         ns.p1_name, ns.p2_name = p1_name, p2_name

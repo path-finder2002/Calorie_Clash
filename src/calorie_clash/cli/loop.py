@@ -8,7 +8,7 @@ from typing import Optional
 from ..core.engine import is_game_over, play_round
 from ..core.types import Hand, Player, RoundResult, Rules
 from .console import console
-from .ui import pointer_symbol
+from .ui import pointer_symbol, instruction_select
 
 
 def prompt_hand(player_name: str) -> Optional[Hand]:
@@ -39,7 +39,7 @@ def print_rules(rules: Rules) -> None:
     )
 
 
-def pick_hand_menu(player_name: str, pointer: str) -> Optional[Hand]:
+def pick_hand_menu(player_name: str, pointer: str, language: str) -> Optional[Hand]:
     sel = questionary.select(
         f"{player_name} の手を選んでください",
         choices=[
@@ -51,6 +51,7 @@ def pick_hand_menu(player_name: str, pointer: str) -> Optional[Hand]:
             questionary.Choice("— 終了 —", "quit"),
         ],
         pointer=pointer,
+        instruction=instruction_select(language),
     ).ask()
     if sel is None:
         return None
@@ -100,7 +101,7 @@ def interactive_loop(
         # P1 input
         while p1_hand is None:
             if input_mode == "menu":
-                sel = pick_hand_menu(p1.name, pointer)
+                sel = pick_hand_menu(p1.name, pointer, language)
                 if sel is None:
                     console.print("[info]Bye![/]")
                     return 0
@@ -142,7 +143,7 @@ def interactive_loop(
         else:
             while p2_hand is None:
                 if input_mode == "menu":
-                    sel2 = pick_hand_menu(p2.name, pointer)
+                    sel2 = pick_hand_menu(p2.name, pointer, language)
                     if sel2 is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -192,6 +193,7 @@ def interactive_loop(
                     ],
                     default="ok",
                     pointer=pointer,
+                    instruction=instruction_select(language),
                 ).ask()
                 confirmed = (sel == "ok")
             else:
@@ -206,7 +208,7 @@ def interactive_loop(
             # P1
             while p1_hand is None:
                 if input_mode == "menu":
-                    sel = pick_hand_menu(p1.name, pointer)
+                    sel = pick_hand_menu(p1.name, pointer, language)
                     if sel is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -245,7 +247,7 @@ def interactive_loop(
             else:
                 while p2_hand is None:
                     if input_mode == "menu":
-                        sel2 = pick_hand_menu(p2.name, pointer)
+                        sel2 = pick_hand_menu(p2.name, pointer, language)
                         if sel2 is None:
                             console.print("[info]Bye![/]")
                             return 0

@@ -5,7 +5,7 @@ import questionary
 
 from .wizard import run_setup_wizard
 from .console import console
-from .ui import pointer_symbol, q_select, q_checkbox
+from .ui import pointer_symbol, q_select, q_checkbox, instruction_select, instruction_checkbox
 
 
 def _language_menu(ns: argparse.Namespace) -> None:
@@ -18,6 +18,7 @@ def _language_menu(ns: argparse.Namespace) -> None:
         ],
         default=lang if lang in {"ja", "en"} else "ja",
         pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask()
     if selected:
         setattr(ns, "language", selected)
@@ -37,6 +38,7 @@ def _rules_menu(ns: argparse.Namespace) -> None:
         "ルール設定（チェックで有効化）",
         choices=[questionary.Choice(label, key, checked=checked) for (label, key, checked) in items],
         pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+        instruction=instruction_checkbox(getattr(ns, "language", "ja")),
     ).ask() or []
 
     ns.tie = "bothEat" if "tie_both_eat" in selected else "rematch"
@@ -71,6 +73,7 @@ def _options_menu(ns: argparse.Namespace) -> None:
                 questionary.Choice("戻る / Back", "back"),
             ],
             pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+            instruction=instruction_select(getattr(ns, "language", "ja")),
         ).ask()
         if choice in (None, "back"):
             return
@@ -97,6 +100,7 @@ def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
                 questionary.Choice("終了 / Exit", "exit"),
             ],
             pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
+            instruction=instruction_select(getattr(ns, "language", "ja")),
         ).ask()
         if choice is None or choice == "exit":
             console.print("[info]Bye![/]")
@@ -122,6 +126,7 @@ def _cursor_menu(ns: argparse.Namespace) -> None:
         choices=choices,
         default=ptr_code,
         pointer=pointer_symbol(ptr_code),
+        instruction=instruction_select(getattr(ns, "language", "ja")),
     ).ask()
     if selected:
         setattr(ns, "pointer", selected)
