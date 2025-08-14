@@ -5,7 +5,7 @@
 ## English (Original)
 
 ### Overview
-This document describes the architecture of the **Hungry Janken (Calorie Clash)** project when implemented in Python. It focuses on a clean, testable core with a thin CLI (and optional TUI) and data driven configuration.
+This document describes the architecture of the **Hungry Janken (Calorie Clash)** project when implemented in Python. The overall project uses both Python and TypeScript; this document focuses on the Python side (core logic/CLI/TUI), while the GUI and web tooling are TypeScript-based. It focuses on a clean, testable core with a thin CLI (and optional TUI) and data driven configuration.
 
 ### Layers
 1. **Presentation Layer**
@@ -50,7 +50,7 @@ This document describes the architecture of the **Hungry Janken (Calorie Clash)*
 ## 日本語（参考訳）
 
 ### 概要
-本ドキュメントは、**Hungry Janken（Calorie Clash）** を Python で実装する場合のアーキテクチャを示します。薄いCLI（および任意のTUI）と、テストしやすいコアロジック、データ駆動の設定を重視します。
+本ドキュメントは、**Hungry Janken（Calorie Clash）** を Python で実装する場合のアーキテクチャを示します。プロジェクト全体は Python と TypeScript を併用しており、本書は Python 側（コアロジック/CLI/TUI）に焦点を当てます（GUIやWebツールは TypeScript ベース）。薄いCLI（および任意のTUI）と、テストしやすいコアロジック、データ駆動の設定を重視します。
 
 ### レイヤー構成
 1. **プレゼンテーション層**

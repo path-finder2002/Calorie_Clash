@@ -53,6 +53,6 @@ npm run preview
 ## Development Conventions
 
 *   **Framework:** The project uses the [React](https://react.dev/) library with [Vite](https://vitejs.dev/) for the build tooling.
-*   **Language:** The primary language is [TypeScript](https://www.typescriptlang.org/).
+*   **Language:** The primary languages are **Python** and **[TypeScript](https://www.typescriptlang.org/)**.
 *   **Styling:** CSS files (`App.css`, `index.css`) are used for styling.
 *   **Linting:** [ESLint](https://eslint.org/) is configured for code quality, with the configuration in `eslint.config.js`.

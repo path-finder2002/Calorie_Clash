@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "calorie-clash"
+version = "0.1.0"
+description = "Hungry Janken (Calorie Clash) CLI game in Python"
+readme = "readme.md"
+requires-python = ">=3.10"
+license = { file = "license.md" }
+authors = [{ name = "Calorie Clash Contributors" }]
+keywords = ["game", "cli", "rock paper scissors", "python"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+  "Topic :: Games/Entertainment",
+]
+dependencies = []
+
+[project.scripts]
+calorie-clash = "calorie_clash.cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/calorie_clash"]
+

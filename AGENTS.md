@@ -16,7 +16,7 @@
 Example: `npm run dev` then open the printed local URL.
 
 ## Coding Style & Naming Conventions
-- TypeScript, React 19, Vite 7. Prefer functional components and hooks.
+- Python 3.11+ and TypeScript; React 19, Vite 7. Prefer functional components and hooks.
 - Indentation: 2 spaces; max 120 cols suggested.
 - Filenames: components `PascalCase.tsx`, hooks `useX.ts`, utilities `camelCase.ts`.
 - Imports: use absolute or relative consistently; group React, third‑party, local.

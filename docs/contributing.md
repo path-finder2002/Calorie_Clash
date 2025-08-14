@@ -10,6 +10,8 @@ Thank you for your interest in contributing! We welcome:
 - Documentation improvements
 - Code changes (bug fixes and features)
 
+This project uses both Python and TypeScript. This document focuses on Python local development; for TypeScript/GUI work, follow the repo’s frontend guidelines.
+
 ### Local Development (Python)
 1. Fork the repository and clone your fork.
 2. Create a virtual environment:
@@ -48,6 +50,8 @@ Thank you for your interest in contributing! We welcome:
 - バグ報告／機能要望
 - ドキュメント改善
 - コード修正（バグ修正・機能追加）
+
+本プロジェクトは Python と TypeScript を併用しています。本書は主に Python 側のローカル開発手順を扱います。TypeScript/GUI についてはリポジトリのフロントエンドガイドラインに従ってください。
 
 ### ローカル開発（Python）
 1. リポジトリをフォークしてクローン。

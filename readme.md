@@ -1,9 +1,9 @@
 # 満腹じゃんけん CLI / Calorie Clash CLI
 
-> 「勝つか、食べるか。」— TypeScriptで動くジャンケン×大食いCLI
+> ポイントを稼ぐか、満腹で脱落か──胃袋の限界バトル。
 
 ## 概要 / Overview
-Node.js 18+ / TypeScript 製のCLIゲームです。1P（vs CPU）/ 2P（vs Player）、カスタムルール（目標ポイント、満腹度容量、時間制限、あいこ時挙動）、入力モード（g/c/p 直入力 or 選択メニュー）に対応。食べ物・キャラクターは拡張可能なデータ構造で管理します。
+Python および Node.js 18+ / TypeScript 製のCLIゲームです。1P（vs CPU）/ 2P（vs Player）、カスタムルール（目標ポイント、満腹度容量、時間制限、あいこ時挙動）、入力モード（g/c/p 直入力 or 選択メニュー）に対応。食べ物・キャラクターは拡張可能なデータ構造で管理します。
 
 ## インストール / Install
 ```bash
@@ -70,3 +70,30 @@ npm test
 - 基本テスト: `src/tests/game.test.ts`
 
 MIT License
+
+---
+
+## Python 版 CLI / Run (Python)
+
+このリポジトリには Python 実装のCLIも含まれます（標準ライブラリのみ）。
+
+### 実行方法（推奨: インストールして実行）
+```bash
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+pip install -e .
+calorie-clash --mode 1p --target 50 --physique medium
+```
+
+### インストールなしで実行（開発時の簡易手順）
+```bash
+PYTHONPATH=src python -m calorie_clash --mode 1p
+# Windows (PowerShell)
+$env:PYTHONPATH="src"; python -m calorie_clash --mode 1p
+```
+
+### 主要オプション
+- `--mode`: `1p` | `2p`
+- `--target`: 目標ポイント（既定 50）
+- `--physique`: `small` | `medium` | `large`（満腹上限 80/100/130）
+- `--p1-name`, `--p2-name`: プレイヤー名
+- `--tie`: `rematch` | `bothEat`（あいこ時の挙動）
