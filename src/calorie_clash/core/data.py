@@ -9,19 +9,19 @@ from .types import Food, Hand
 
 DEFAULT_FOODS: Dict[Hand, List[Food]] = {
     Hand.ROCK: [
-        Food("グラタン", 18),
-        Food("グミ", 8),
-        Food("グリルチキン", 22),
+        Food("グラタン", 180),
+        Food("グミ", 80),
+        Food("グリルチキン", 220),
     ],
     Hand.SCISSORS: [
-        Food("チョコ", 12),
-        Food("チキン", 16),
-        Food("チャーハン", 24),
+        Food("チョコ", 120),
+        Food("チキン", 160),
+        Food("チャーハン", 240),
     ],
     Hand.PAPER: [
-        Food("パスタ", 20),
-        Food("パンケーキ", 26),
-        Food("パエリア", 28),
+        Food("パスタ", 200),
+        Food("パンケーキ", 260),
+        Food("パエリア", 280),
     ],
 }
 
