@@ -23,20 +23,22 @@ def cpu_pick() -> Hand:
 
 
 def print_status(p1: Player, p2: Player, rules: Rules) -> None:
+    console.line()
     console.print(
-        f"[info]\nStatus[/]: "
+        f"[info]Status[/]: "
         f"[bold]{p1.name}[/]: {p1.points}pt / {p1.consumed_kcal}/{p1.max_kcal}kcal | "
         f"[bold]{p2.name}[/]: {p2.points}pt / {p2.consumed_kcal}/{p2.max_kcal}kcal | "
-        f"target=[bold]{rules.target_points}[/]\n"
+        f"target=[bold]{rules.target_points}[/]"
     )
+    console.line()
 
 
 def print_rules(rules: Rules) -> None:
-    console.print("\n[rule]Rules[/rule]:")
+    console.line()
+    console.print("[rule]Rules[/rule]:")
     console.print(f"- target points: [bold]{rules.target_points}[/]")
-    console.print(
-        f"- tie: [bold]{'both eat own food' if rules.tie_rule_both_eat else 'rematch'}[/]\n"
-    )
+    console.print(f"- tie: [bold]{'both eat own food' if rules.tie_rule_both_eat else 'rematch'}[/]")
+    console.line()
 
 
 def pick_hand_menu(player_name: str, pointer: str, language: str) -> Optional[Hand]:
@@ -90,10 +92,13 @@ def interactive_loop(
     language: str = "ja",
     pointer_code: str = "tri",
 ) -> int:
-    console.print("\n[rule]コマンド: :help / :status / :rules / :quit[/rule]")
+    console.line()
+    console.print("[rule]コマンド: :help / :status / :rules / :quit[/rule]")
+    console.line()
     round_no = 1
     while True:
         console.print(f"[rule]--- Round {round_no} ---[/rule]")
+        console.line()
         p1_hand: Optional[Hand] = None
         p2_hand: Optional[Hand] = None
         pointer = pointer_symbol(pointer_code)
@@ -283,6 +288,7 @@ def interactive_loop(
 
         # Janken animation (configurable interval): ジャン -> ケン -> ポン！
         if anim_enabled:
+            console.line()
             console.print("[info]ジャン…[/]" if language != "en" else "[info]Jan…[/]")
             sleep(anim_interval)
             console.print("[info]ケン…[/]" if language != "en" else "[info]Ken…[/]")
@@ -292,7 +298,8 @@ def interactive_loop(
         else:
             console.print("[title]ポン！[/]" if language != "en" else "[title]Pon![/]")
 
-        console.print(f"\n[bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
+        console.line()
+        console.print(f"[bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
         result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules)
         if result.tie:
             console.print("[tie]勝敗判定: あいこ[/]" if language != "en" else "[tie]Result: Tie[/]")
@@ -309,10 +316,13 @@ def interactive_loop(
                     f"/ Loser eats '{result.winner_food.name}' [error]+{result.loser_added_kcal}kcal[/]"
                 )
             )
+        console.line()
         print_status(p1, p2, rules)
 
         over, champion = is_game_over(p1, p2, rules)
         if over:
-            console.print(f"[success]🏆 勝者: {champion.name}! お疲れさまでした。[/]\n")
+            console.line()
+            console.print(f"[success]🏆 勝者: {champion.name}! お疲れさまでした。[/]")
+            console.line()
             return 0
         round_no += 1

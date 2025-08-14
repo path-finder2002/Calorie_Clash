@@ -91,7 +91,9 @@ def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
     start_game=False when user chose Exit or cancelled.
     """
     while True:
-        console.print("[title]\nCalorie Clash (CLI)[/title]")
+        console.line()
+        console.print("[title]Calorie Clash (CLI)[/title]")
+        console.line()
         choice = questionary.select(
             "メニュー",
             choices=[
