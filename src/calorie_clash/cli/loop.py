@@ -325,6 +325,8 @@ def interactive_loop(
             result: RoundResult = play_round(p1, p2, p1_hand, p2_hand, rules, foods)
         else:
             result = play_round(p1, p2, p1_hand, p2_hand, rules)
+        # Delay result log for readability
+        sleep(1)
         if result.tie:
             console.print("[tie]勝敗判定: あいこ[/]" if language != "en" else "[tie]Result: Tie[/]")
         else:
