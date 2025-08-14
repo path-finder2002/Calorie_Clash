@@ -3,56 +3,35 @@
 > ポイントを稼ぐか、満腹で脱落か──胃袋の限界バトル。
 
 ## 概要 / Overview
-Python および Node.js 18+ / TypeScript 製のCLIゲームです。1P（vs CPU）/ 2P（vs Player）、カスタムルール（目標ポイント、満腹度容量、時間制限、あいこ時挙動）、入力モード（g/c/p 直入力 or 選択メニュー）に対応。食べ物・キャラクターは拡張可能なデータ構造で管理します。
+Python 製の CLI ゲームです。1P（vs CPU）/ 2P（vs Player）、カスタムルール（目標ポイント、満腹度容量、あいこ時挙動）、入力モード（g/c/p 直入力 or questionary による選択メニュー）に対応。
+Rich による色付き出力で視認性を高めています。
 
 ## インストール / Install
 ```bash
-npm i
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+pip install -e .
 ```
 
 ## 実行 / Run
 ```bash
-npx tsx src/main.ts [--mode=1p|2p|tutorial] [--input=direct|menu] \
-  [--target=5] [--capacity=100] [--multiplier=1] \
-  [--time=20] [--tie=replay|bothEat|skip] [--physique=small|medium|large] \
-  [--p1-name=NAME] [--p2-name=NAME] [--p1-physique=small|medium|large] [--p2-physique=small|medium|large]
-```
+# 引数なしで実行（タイトル画面 → スタート/オプション/終了）
+calorie-clash
 
-例: 1P・メニュー入力・あいこで両者食べる
-```bash
-npx tsx src/main.ts --mode=1p --input=menu --tie=bothEat
-```
+# 2P 対戦（両者とも人間）
+calorie-clash --mode 2p
 
-例: チュートリアルを開始してから通常ゲームへ
-```bash
-npx tsx src/main.ts --mode=tutorial
-```
+# questionary による選択メニュー入力
+calorie-clash --mode 1p --input menu
 
-例: 2P対戦（両者とも人間）
-```bash
-npx tsx src/main.ts --mode=2p
-```
+# セットアップウィザードで起動（モード/体格/タイールール等を対話設定）
+calorie-clash --wizard
 
-### 体格（容量プリセット）
-- `--physique=small|medium|large` で容量をプリセット（small: 80 / medium: 100 / large: 130）。
-- 起動時メニューでも体格を選択できます（選択すると `capacity` が上書きされます）。
-```bash
-npx tsx src/main.ts --mode=1p --physique=large
-```
-
-### 名前と個別体格
-- 起動時メニューでP1/P2の名前と体格を個別に設定可能。
-- CLIからも指定できます。
-```bash
-npx tsx src/main.ts --mode=2p \
-  --p1-name=太郎 --p1-physique=large \
-  --p2-name=花子 --p2-physique=small
+# インストールせずに実行（開発時）
+PYTHONPATH=src python -m calorie_clash --mode 1p  # Windows: $env:PYTHONPATH="src"; python -m calorie_clash --mode 1p
 ```
 
 ## テスト / Test
-```bash
-npm test
-```
+（任意）pytest を導入後に追加予定です。
 
 ## メニューで使えるコマンド
 - `:help` ヘルプ表示
@@ -61,52 +40,34 @@ npm test
 - `:set key=value` ルール変更（`input=direct|menu`, `time=秒`, `tie=replay|bothEat|skip`, `target=数`, `capacity=数`, `multiplier=数`）
 - `:quit` 終了
 
+## アニメーション / 確認
+- 決定確認: 双方の手の選択後に「決定/やり直し」を確認
+- ジャン・ケン・ポン！: 1秒刻みで表示（ジャン → ケン → ポン！）
+
+## タイトル/オプション
+- タイトル: 「ゲームスタート」「オプション」「終了」
+- オプション: 
+  - 言語設定（ja/en）
+  - ルール設定（チェックボックス）
+    - あいこ時に両者食べる（bothEat）
+    - 入力方式を選択メニュー（questionary）にする
+
 ## 仕組み / Architecture
-- ゲームロジック: `src/core/game.ts`
-- UI入出力: `src/cli/ui.ts`
-- 設定/引数: `src/cli/config.ts`
-- データ(食べ物/キャラ): `src/core/data.ts`
-- エントリ: `src/main.ts`（薄い） / 実体: `src/cli/main.ts`
-- 基本テスト: `src/tests/game.test.ts`
+- コア型/データ: `src/calorie_clash/core/types.py`, `src/calorie_clash/core/data.py`
+- ゲームロジック: `src/calorie_clash/core/engine.py`
+- CLI入出力/進行: `src/calorie_clash/cli/loop.py`
+- セットアップウィザード: `src/calorie_clash/cli/wizard.py`
+- タイトル/オプション: `src/calorie_clash/cli/title.py`
+- エントリ: `src/calorie_clash/cli/main.py` / `src/calorie_clash/__main__.py`
+- コンソール（色テーマ）: `src/calorie_clash/cli/console.py`
 
 MIT License
 
----
-
-## Python 版 CLI / Run (Python)
-
-このリポジトリには Python 実装のCLIも含まれます（標準ライブラリのみ）。
-
-### 実行方法（推奨: インストールして実行）
-```bash
-python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e .
-calorie-clash --mode 1p --target 50 --physique medium
-```
-
-### インストールなしで実行（開発時の簡易手順）
-```bash
-PYTHONPATH=src python -m calorie_clash --mode 1p
-# Windows (PowerShell)
-$env:PYTHONPATH="src"; python -m calorie_clash --mode 1p
-```
-
 ### 主要オプション
 - `--mode`: `1p` | `2p`
+- `--input`: `direct` | `menu`（questionary）
 - `--target`: 目標ポイント（既定 50）
 - `--physique`: `small` | `medium` | `large`（満腹上限 80/100/130）
 - `--p1-name`, `--p2-name`: プレイヤー名
 - `--tie`: `rematch` | `bothEat`（あいこ時の挙動）
-
-### メニュー入力（questionary）
-インストール済み（`pip install -e .`）であれば、選択式の入力が利用できます。
-```bash
-calorie-clash --mode 2p --input menu
-```
-各プレイヤーはメニューから「グー/チョキ/パー」を選択でき、あわせて「ステータス表示」「ルール表示」「終了」を選べます。
-
-### セットアップウィザード（questionary）
-起動時にモード/体格/あいこ挙動/目標ポイント/入力方式を対話的に設定できます。
-```bash
-calorie-clash --wizard
-```
+- `--wizard`: 起動時にセットアップウィザードを実行

@@ -9,6 +9,8 @@ from typing import Optional
 from ..core.data import PHYSIQUE_CAPACITY
 from ..core.types import Rules, Player
 from .wizard import run_setup_wizard
+from .title import title_screen
+from .console import console
 from .loop import interactive_loop, print_rules, print_status
 
 
@@ -176,7 +178,13 @@ def interactive_loop(p1: Player, p2: Player, rules: Rules, mode: str, input_mode
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    ns = parse_args(argv or sys.argv[1:])
+    raw_argv = sys.argv[1:] if argv is None else argv
+    ns = parse_args(raw_argv)
+    # If no arguments given, show title screen by default
+    if len(raw_argv) == 0:
+        start, ns = title_screen(ns)
+        if not start:
+            return 0
     if ns.wizard:
         ns = run_setup_wizard(ns)
     rules = Rules(target_points=ns.target, tie_rule_both_eat=(ns.tie == "bothEat"))
@@ -202,8 +210,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             p1 = Player(name=ns.p1_name, max_kcal=pick_cap("P1"))
             p2 = Player(name=ns.p2_name, max_kcal=pick_cap("P2"))
 
-    print("\n=== Calorie Clash (Python CLI) ===")
-    print("ポイントを稼ぐか、満腹で脱落か──胃袋の限界バトル。\n")
+    console.print("\n[title]=== Calorie Clash (Python CLI) ===[/title]")
+    console.print("[info]ポイントを稼ぐか、満腹で脱落か──胃袋の限界バトル。[/]\n")
     print_rules(rules)
     print_status(p1, p2, rules)
 
