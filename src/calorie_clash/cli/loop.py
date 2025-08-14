@@ -154,6 +154,23 @@ def _confirm_quit(language: str, ui_ns=None) -> bool:
     return ans in {"y", "yes"}
 
 
+def _show_command_menu(ui_ns, language: str):
+    msg = "コマンドを選んでください" if language != "en" else "Choose a command"
+    return q_select(
+        msg,
+        choices=[
+            questionary.Choice("📊 ステータス / Status", "status") if language != "en" else questionary.Choice("📊 Status", "status"),
+            questionary.Choice("📜 ルール / Rules", "rules") if language != "en" else questionary.Choice("📜 Rules", "rules"),
+            questionary.Choice("❓ ヘルプ / Help", "help") if language != "en" else questionary.Choice("❓ Help", "help"),
+            questionary.Separator(" "),
+            questionary.Choice("🚪 終了 / Quit", "quit") if language != "en" else questionary.Choice("🚪 Quit", "quit"),
+            questionary.Choice("↩ 戻る / Back", "back") if language != "en" else questionary.Choice("↩ Back", "back"),
+        ],
+        ns=ui_ns,
+        default="back",
+    ).ask()
+
+
 def _commit_for(name: str, hand: Hand) -> tuple[str, str]:
     return make_commit(name, hand)
 
@@ -241,7 +258,27 @@ def interactive_loop(
                         console.print(msg)
                     break
                 # command handling (direct mode)
+                console.print("[rule]コマンド: :help / :status / :rules / :quit（空Enterでメニュー）[/rule]" if language != "en" else "[rule]Commands: :help / :status / :rules / :quit (Enter for menu)[/rule]")
                 raw = input(":command> ").strip().lower()
+                if raw in {"", ":", ":menu"}:
+                    sel = _show_command_menu(ui_ns, language)
+                    if sel is None or sel == "back":
+                        continue
+                    if sel == "quit":
+                        if _confirm_quit(language, ui_ns):
+                            console.print("[info]Bye![/]")
+                            return 0
+                        else:
+                            continue
+                    if sel == "status":
+                        print_status(p1, p2, rules)
+                        continue
+                    if sel == "rules":
+                        print_rules(rules)
+                        continue
+                    if sel == "help":
+                        console.print("[info]:help, :status, :rules, :quit を入力できます。[/]" if language != "en" else "[info]Available: :help, :status, :rules, :quit[/]")
+                        continue
                 if raw in {":quit", ":q", ":exit"}:
                     if _confirm_quit(language):
                         console.print("[info]Bye![/]")
@@ -306,7 +343,32 @@ def interactive_loop(
                 else:
                     p2_hand = prompt_hand(p2.name)
                     if p2_hand is None:
+                        console.print("[rule]コマンド: :help / :status / :rules / :quit（空Enterでメニュー）[/rule]" if language != "en" else "[rule]Commands: :help / :status / :rules / :quit (Enter for menu)[/rule]")
                         raw = input(":command> ").strip().lower()
+                        if raw in {"", ":", ":menu"}:
+                            sel = _show_command_menu(ui_ns, language)
+                            if sel is None or sel == "back":
+                                p2_hand = None
+                                continue
+                            if sel == "quit":
+                                if _confirm_quit(language, ui_ns):
+                                    console.print("[info]Bye![/]")
+                                    return 0
+                                else:
+                                    p2_hand = None
+                                    continue
+                            if sel == "status":
+                                print_status(p1, p2, rules)
+                                p2_hand = None
+                                continue
+                            if sel == "rules":
+                                print_rules(rules)
+                                p2_hand = None
+                                continue
+                            if sel == "help":
+                                console.print("[info]:help, :status, :rules, :quit を入力できます。[/]" if language != "en" else "[info]Available: :help, :status, :rules, :quit[/]")
+                                p2_hand = None
+                                continue
                         if raw in {":quit", ":q", ":exit"}:
                             if _confirm_quit(language):
                                 console.print("[info]Bye![/]")
