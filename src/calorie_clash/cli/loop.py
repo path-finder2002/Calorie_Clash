@@ -201,7 +201,7 @@ def interactive_loop(
         # P1 input
         while p1_hand is None:
             if input_mode == "menu":
-                sel = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p1.name, ui_ns)
+                sel = pick_hand_menu_secure(p1.name, ui_ns)
                 if sel is None:
                     console.print("[info]Bye![/]")
                     return 0
@@ -218,15 +218,14 @@ def interactive_loop(
                     print_rules(rules)
                     continue
                 p1_hand = sel  # type: ignore[assignment]
-                if mode == "2p":
-                    p1_commit = _commit_for(p1.name, p1_hand)
-                    ch = p1_commit[0][:12]
-                    msg = (
-                        f"[info]{p1.name} のコミットメント: {ch}…[/]"
-                        if language != "en"
-                        else f"[info]{p1.name} commitment: {ch}…[/]"
-                    )
-                    console.print(msg)
+                p1_commit = _commit_for(p1.name, p1_hand)
+                ch = p1_commit[0][:12]
+                msg = (
+                    f"[info]{p1.name} のコミットメント: {ch}…[/]"
+                    if language != "en"
+                    else f"[info]{p1.name} commitment: {ch}…[/]"
+                )
+                console.print(msg)
             else:
                 h = prompt_hand(p1.name)
                 if h is not None:
@@ -336,12 +335,8 @@ def interactive_loop(
         # Confirmation step
         while True:
             # Show confirmation with hidden opponent (commitment) to keep it fair
-            if mode == "1p":
-                p1_disp = show(p1_hand)
-                p2_disp = f"[committed {commit_prefix(p2_commit[0])}]" if p2_commit else "[committed]"
-            else:  # 2p: both are hidden by commitment
-                p1_disp = f"[committed {commit_prefix(p1_commit[0])}]" if p1_commit else "[committed]"
-                p2_disp = f"[committed {commit_prefix(p2_commit[0])}]" if p2_commit else "[committed]"
+            p1_disp = f"[committed {commit_prefix(p1_commit[0])}]" if p1_commit else "[committed]"
+            p2_disp = f"[committed {commit_prefix(p2_commit[0])}]" if p2_commit else "[committed]"
             console.print(
                 f"[info]選択中: [bold]{p1.name}[/]: {p1_disp} vs [bold]{p2.name}[/]: {p2_disp}"
                 if language != "en"
