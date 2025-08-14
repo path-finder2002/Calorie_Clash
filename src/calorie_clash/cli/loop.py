@@ -70,8 +70,6 @@ def pick_hand_menu(player_name: str, ns) -> Optional[Hand]:
     ).ask()
     if sel is None:
         return None
-    if sel == "quit":
-        return None
     if sel == "status":
         return "status"  # type: ignore[return-value]
     if sel == "rules":
@@ -92,6 +90,26 @@ def _hand_label(hand: Hand, lang: str) -> str:
     else:
         names = {Hand.ROCK: "グー", Hand.SCISSORS: "チョキ", Hand.PAPER: "パー"}
     return f"{names[hand]} {EMOJI[hand]}"
+
+
+def _confirm_quit(language: str, ui_ns=None) -> bool:
+    """Ask for quit confirmation. Returns True if user confirms quit."""
+    if ui_ns is not None:
+        msg = "終了しますか？" if language != "en" else "Quit the game?"
+        sel = q_select(
+            msg,
+            choices=[
+                questionary.Choice("はい", "yes") if language != "en" else questionary.Choice("Yes", "yes"),
+                questionary.Choice("いいえ", "no") if language != "en" else questionary.Choice("No", "no"),
+            ],
+            ns=ui_ns,
+            default="no",
+        ).ask()
+        return sel == "yes"
+    # Fallback: direct y/n prompt
+    prompt = "終了しますか？ (y/N): " if language != "en" else "Quit the game? (y/N): "
+    ans = input(prompt).strip().lower()
+    return ans in {"y", "yes"}
 
 
 def _commit_for(name: str, hand: Hand) -> tuple[str, str]:
@@ -152,6 +170,12 @@ def interactive_loop(
                 if sel is None:
                     console.print("[info]Bye![/]")
                     return 0
+                if sel == "quit":  # type: ignore[comparison-overlap]
+                    if _confirm_quit(language, ui_ns):
+                        console.print("[info]Bye![/]")
+                        return 0
+                    else:
+                        continue
                 if sel == "status":  # type: ignore[comparison-overlap]
                     print_status(p1, p2, rules)
                     continue
@@ -185,8 +209,11 @@ def interactive_loop(
                 # command handling (direct mode)
                 raw = input(":command> ").strip().lower()
                 if raw in {":quit", ":q", ":exit"}:
-                    console.print("[info]Bye![/]")
-                    return 0
+                    if _confirm_quit(language):
+                        console.print("[info]Bye![/]")
+                        return 0
+                    else:
+                        continue
                 if raw in {":status", ":s"}:
                     print_status(p1, p2, rules)
                     continue
@@ -221,6 +248,12 @@ def interactive_loop(
                     if sel2 is None:
                         console.print("[info]Bye![/]")
                         return 0
+                    if sel2 == "quit":  # type: ignore[comparison-overlap]
+                        if _confirm_quit(language, ui_ns):
+                            console.print("[info]Bye![/]")
+                            return 0
+                        else:
+                            continue
                     if sel2 == "status":  # type: ignore[comparison-overlap]
                         print_status(p1, p2, rules)
                         continue
@@ -241,8 +274,11 @@ def interactive_loop(
                     if p2_hand is None:
                         raw = input(":command> ").strip().lower()
                         if raw in {":quit", ":q", ":exit"}:
-                            console.print("[info]Bye![/]")
-                            return 0
+                            if _confirm_quit(language):
+                                console.print("[info]Bye![/]")
+                                return 0
+                            else:
+                                continue
                         if raw in {":status", ":s"}:
                             print_status(p1, p2, rules)
                             p2_hand = None
@@ -296,6 +332,12 @@ def interactive_loop(
                     if sel is None:
                         console.print("[info]Bye![/]")
                         return 0
+                    if sel == "quit":  # type: ignore[comparison-overlap]
+                        if _confirm_quit(language, ui_ns):
+                            console.print("[info]Bye![/]")
+                            return 0
+                        else:
+                            continue
                     if sel == "status":  # type: ignore[comparison-overlap]
                         print_status(p1, p2, rules)
                         continue
@@ -335,6 +377,12 @@ def interactive_loop(
                         if sel2 is None:
                             console.print("[info]Bye![/]")
                             return 0
+                        if sel2 == "quit":  # type: ignore[comparison-overlap]
+                            if _confirm_quit(language, ui_ns):
+                                console.print("[info]Bye![/]")
+                                return 0
+                            else:
+                                continue
                         if sel2 == "status":  # type: ignore[comparison-overlap]
                             print_status(p1, p2, rules)
                             continue
