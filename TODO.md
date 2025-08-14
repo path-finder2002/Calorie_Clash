@@ -39,6 +39,7 @@ CLI版「満腹じゃんけん」を、React + Vite を用いたモダンなWeb�
 - [ ] ゲームコアロジックのユニットテストを拡充
 - [ ] UIコンポーネントのテスト（Storybook / Vitest）
 - [ ] GitHub Actionsを利用したCI（ビルド、テスト、Lint）の設定
+- [x] GitHub Projectの自動化ワークフロー追加
 
 ## 将来案 (Future)
 - [ ] オンライン対戦モード (WebSocket)

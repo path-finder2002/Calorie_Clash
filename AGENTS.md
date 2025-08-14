@@ -37,3 +37,6 @@ Example: `npm run dev` then open the printed local URL.
 ## Security & Configuration Tips
 - Do not commit secrets. Vite env vars should use `VITE_` prefix and live in local `.env` files ignored by Git.
 - Review `docs/architecture.md` for high‑level design before larger changes.
+
+## Automation
+- `.github/workflows/project-automation.yml` creates the "📋 Project Tasks" project and auto-adds new issues to its "To Do" column.
