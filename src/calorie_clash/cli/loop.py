@@ -123,6 +123,10 @@ def interactive_loop(
     console.line()
     console.print("[rule]コマンド: :help / :status / :rules / :quit[/rule]")
     console.line()
+    # Show start banner and wait 3 seconds before enabling selection
+    console.print("[title]Game Start.[/]")
+    sleep(3)
+    console.line()
     round_no = 1
     while True:
         console.print(f"[rule]--- Round {round_no} ---[/rule]")
