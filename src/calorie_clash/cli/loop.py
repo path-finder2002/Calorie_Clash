@@ -8,6 +8,7 @@ from typing import Optional
 from ..core.engine import is_game_over, play_round
 from ..core.types import Hand, Player, RoundResult, Rules
 from .console import console, gauge_bar
+from rich.table import Table
 from .ui import pointer_symbol, instruction_select, q_select
 from ..crypto.commit import make_commit, commit_prefix
 
@@ -25,29 +26,30 @@ def cpu_pick() -> Hand:
 
 def print_status(p1: Player, p2: Player, rules: Rules) -> None:
     console.line()
-    # Prepare aligned fields
-    s1 = f"{p1.points}/{rules.target_points}"
-    s2 = f"{p2.points}/{rules.target_points}"
-    w_score = max(len(s1), len(s2))
-    f1 = f"{p1.consumed_kcal}/{p1.max_kcal} kcal"
-    f2 = f"{p2.consumed_kcal}/{p2.max_kcal} kcal"
-    w_full = max(len(f1), len(f2))
+    # Build a compact table: Name | Metric | Value | Gauge
+    table = Table(show_header=False, box=None, pad_edge=False)
+    table.add_column("name", style="bold")
+    table.add_column("metric")
+    table.add_column("value", justify="right")
+    table.add_column("gauge")
 
-    # Player 1
+    # Player 1 gauges
     p1_score_bar = gauge_bar(p1.points, rules.target_points, width=24, color="green")
     p1_full_color = "red" if p1.consumed_kcal / max(1, p1.max_kcal) >= 0.8 else ("yellow" if p1.consumed_kcal else "cyan")
     p1_full_bar = gauge_bar(p1.consumed_kcal, p1.max_kcal, width=24, color=p1_full_color)
-    console.print(f"[bold]{p1.name}[/]")
-    console.print(f"  Score  {s1.rjust(w_score)}  {p1_score_bar}")
-    console.print(f"  Full   {f1.rjust(w_full)}  {p1_full_bar}")
-    console.line()
-    # Player 2
+    table.add_row(p1.name, "Score", f"{p1.points}/{rules.target_points}", p1_score_bar)
+    table.add_row("", "Full", f"{p1.consumed_kcal}/{p1.max_kcal} kcal", p1_full_bar)
+    # Spacer row
+    table.add_row("", "", "", "")
+
+    # Player 2 gauges
     p2_score_bar = gauge_bar(p2.points, rules.target_points, width=24, color="green")
     p2_full_color = "red" if p2.consumed_kcal / max(1, p2.max_kcal) >= 0.8 else ("yellow" if p2.consumed_kcal else "cyan")
     p2_full_bar = gauge_bar(p2.consumed_kcal, p2.max_kcal, width=24, color=p2_full_color)
-    console.print(f"[bold]{p2.name}[/]")
-    console.print(f"  Score  {s2.rjust(w_score)}  {p2_score_bar}")
-    console.print(f"  Full   {f2.rjust(w_full)}  {p2_full_bar}")
+    table.add_row(p2.name, "Score", f"{p2.points}/{rules.target_points}", p2_score_bar)
+    table.add_row("", "Full", f"{p2.consumed_kcal}/{p2.max_kcal} kcal", p2_full_bar)
+
+    console.print(table)
     console.line()
 
 
