@@ -342,6 +342,11 @@ def interactive_loop(
                     f"/ Loser eats '{result.winner_food.name}' [error]+{result.loser_added_kcal}kcal[/]"
                 )
             )
+            # Additional short cheer line
+            winline = (
+                f"{result.winner.name}の勝ち！" if language != "en" else f"{result.winner.name} wins!"
+            )
+            console.print(f"[success]{winline}[/]")
         console.line()
         print_status(p1, p2, rules)
 
