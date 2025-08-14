@@ -5,6 +5,7 @@ import questionary
 
 from .wizard import run_setup_wizard
 from .console import console
+from .ui import pointer_symbol, q_select, q_checkbox
 
 
 def _language_menu(ns: argparse.Namespace) -> None:
@@ -16,6 +17,7 @@ def _language_menu(ns: argparse.Namespace) -> None:
             questionary.Choice("English (en)", "en"),
         ],
         default=lang if lang in {"ja", "en"} else "ja",
+        pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
     ).ask()
     if selected:
         setattr(ns, "language", selected)
@@ -34,6 +36,7 @@ def _rules_menu(ns: argparse.Namespace) -> None:
     selected = questionary.checkbox(
         "ルール設定（チェックで有効化）",
         choices=[questionary.Choice(label, key, checked=checked) for (label, key, checked) in items],
+        pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
     ).ask() or []
 
     ns.tie = "bothEat" if "tie_both_eat" in selected else "rematch"
@@ -64,8 +67,10 @@ def _options_menu(ns: argparse.Namespace) -> None:
             choices=[
                 questionary.Choice("言語設定 / Language", "lang"),
                 questionary.Choice("ルール設定 / Rules", "rules"),
+                questionary.Choice("カーソル表示 / Cursor", "cursor"),
                 questionary.Choice("戻る / Back", "back"),
             ],
+            pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
         ).ask()
         if choice in (None, "back"):
             return
@@ -73,6 +78,8 @@ def _options_menu(ns: argparse.Namespace) -> None:
             _language_menu(ns)
         elif choice == "rules":
             _rules_menu(ns)
+        elif choice == "cursor":
+            _cursor_menu(ns)
 
 
 def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
@@ -89,6 +96,7 @@ def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
                 questionary.Choice("オプション / Options", "options"),
                 questionary.Choice("終了 / Exit", "exit"),
             ],
+            pointer=pointer_symbol(getattr(ns, "pointer", "tri")),
         ).ask()
         if choice is None or choice == "exit":
             console.print("[info]Bye![/]")
@@ -100,3 +108,20 @@ def title_screen(ns: argparse.Namespace) -> tuple[bool, argparse.Namespace]:
             # Use wizard to configure before start
             ns = run_setup_wizard(ns)
             return True, ns
+
+
+def _cursor_menu(ns: argparse.Namespace) -> None:
+    ptr_code = getattr(ns, "pointer", "tri")
+    choices = [
+        questionary.Choice("❯ (tri)", "tri"),
+        questionary.Choice("> (gt)", "gt"),
+        questionary.Choice("👉 (hand)", "hand"),
+    ]
+    selected = questionary.select(
+        "カーソル表示 / Cursor",
+        choices=choices,
+        default=ptr_code,
+        pointer=pointer_symbol(ptr_code),
+    ).ask()
+    if selected:
+        setattr(ns, "pointer", selected)
