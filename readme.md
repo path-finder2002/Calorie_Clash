@@ -91,3 +91,6 @@ MIT License
 - `--underline-color`: `cyan|magenta|green|yellow|blue|white`
 - `--foods-csv`: 食べ物CSVのパス（`hand,name,kcal[,points]`）
 - `--foods-mode`: `extend` | `replace`（CSVの適用方法）
+
+## プロジェクト管理 / Project Management
+このリポジトリでは GitHub Actions によってプロジェクトボードを自動生成します。新規リポジトリ作成時に "📋 Project Tasks" プロジェクトと "To Do", "In Progress", "Done" のカラムが作成され、Issue が作成されると "To Do" カラムへカードとして追加されます。
