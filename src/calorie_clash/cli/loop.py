@@ -239,7 +239,8 @@ def interactive_loop(
         # P1 input
         while p1_hand is None:
             if input_mode == "menu":
-                sel = pick_hand_menu_secure(p1.name, ui_ns)
+                # Respect secure_select flag; only mask options when requested
+                sel = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p1.name, ui_ns)
                 if sel is None:
                     console.print("[info]Bye![/]")
                     return 0
@@ -336,7 +337,8 @@ def interactive_loop(
         else:
             while p2_hand is None:
                 if input_mode == "menu":
-                    sel2 = pick_hand_menu_secure(p2.name, ui_ns)
+                    # Respect secure_select flag for P2 as well
+                    sel2 = (pick_hand_menu_secure if secure_select else pick_hand_menu)(p2.name, ui_ns)
                     if sel2 is None:
                         console.print("[info]Bye![/]")
                         return 0
@@ -426,8 +428,17 @@ def interactive_loop(
         # Confirmation step
         while True:
             # Show confirmation with hidden opponent (commitment) to keep it fair
-            p1_disp = f"[committed {commit_prefix(p1_commit[0])}]" if p1_commit else "[committed]"
-            p2_disp = f"[committed {commit_prefix(p2_commit[0])}]" if p2_commit else "[committed]"
+            # Avoid Rich markup being swallowed by square brackets by using plain text
+            p1_disp = (
+                f"commit {commit_prefix(p1_commit[0])}"
+                if p1_commit
+                else "committed"
+            )
+            p2_disp = (
+                f"commit {commit_prefix(p2_commit[0])}"
+                if p2_commit
+                else "committed"
+            )
             console.print(
                 f"[info]選択中: [bold]{p1.name}[/]: {p1_disp} vs [bold]{p2.name}[/]: {p2_disp}"
                 if language != "en"
