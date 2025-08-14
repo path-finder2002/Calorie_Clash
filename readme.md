@@ -97,3 +97,16 @@ $env:PYTHONPATH="src"; python -m calorie_clash --mode 1p
 - `--physique`: `small` | `medium` | `large`（満腹上限 80/100/130）
 - `--p1-name`, `--p2-name`: プレイヤー名
 - `--tie`: `rematch` | `bothEat`（あいこ時の挙動）
+
+### メニュー入力（questionary）
+インストール済み（`pip install -e .`）であれば、選択式の入力が利用できます。
+```bash
+calorie-clash --mode 2p --input menu
+```
+各プレイヤーはメニューから「グー/チョキ/パー」を選択でき、あわせて「ステータス表示」「ルール表示」「終了」を選べます。
+
+### セットアップウィザード（questionary）
+起動時にモード/体格/あいこ挙動/目標ポイント/入力方式を対話的に設定できます。
+```bash
+calorie-clash --wizard
+```

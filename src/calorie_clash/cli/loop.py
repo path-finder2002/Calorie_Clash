@@ -1,39 +1,11 @@
 from __future__ import annotations
 
-import argparse
-import sys
-from dataclasses import dataclass
+import questionary
 from random import choice
 from typing import Optional
 
-from ..core.data import PHYSIQUE_CAPACITY
-from ..core.types import Rules, Player
-from .wizard import run_setup_wizard
-from .loop import interactive_loop, print_rules, print_status
-
-
-def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        prog="calorie-clash",
-        description=(
-            "ポイントを稼ぐか、満腹で脱落か──胃袋の限界バトル。\n"
-            "Hungry Janken (Calorie Clash) — Python CLI"
-        ),
-    )
-    parser.add_argument("--mode", choices=["1p", "2p"], default="1p", help="1p (vs CPU) or 2p")
-    parser.add_argument("--input", choices=["direct", "menu"], default="direct", help="Input mode: direct or menu (questionary)")
-    parser.add_argument("--target", type=int, default=50, help="Target points to win (default 50)")
-    parser.add_argument(
-        "--physique",
-        choices=list(PHYSIQUE_CAPACITY.keys()),
-        default="medium",
-        help="Capacity preset for both players in 1p; for 2p you can customize in the prompts",
-    )
-    parser.add_argument("--p1-name", default="P1", help="Player 1 name")
-    parser.add_argument("--p2-name", default="CPU", help="Player 2 name")
-    parser.add_argument("--tie", choices=["rematch", "bothEat"], default="rematch", help="Tie rule")
-    parser.add_argument("--wizard", action="store_true", help="Launch interactive setup wizard (questionary)")
-    return parser.parse_args(argv)
+from ..core.engine import is_game_over, play_round
+from ..core.types import Hand, Player, RoundResult, Rules
 
 
 def prompt_hand(player_name: str) -> Optional[Hand]:
@@ -43,6 +15,21 @@ def prompt_hand(player_name: str) -> Optional[Hand]:
     return Hand.from_input(raw)
 
 
+def cpu_pick() -> Hand:
+    return choice([Hand.ROCK, Hand.SCISSORS, Hand.PAPER])
+
+
+def print_status(p1: Player, p2: Player, rules: Rules) -> None:
+    print(
+        f"\nStatus: {p1.name}: {p1.points}pt / {p1.consumed_kcal}/{p1.max_kcal}kcal | "
+        f"{p2.name}: {p2.points}pt / {p2.consumed_kcal}/{p2.max_kcal}kcal | target={rules.target_points}\n"
+    )
+
+
+def print_rules(rules: Rules) -> None:
+    print("\nRules:")
+    print(f"- target points: {rules.target_points}")
+    print(f"- tie: {'both eat own food' if rules.tie_rule_both_eat else 'rematch'}\n")
 
 
 def pick_hand_menu(player_name: str) -> Optional[Hand]:
@@ -174,41 +161,3 @@ def interactive_loop(p1: Player, p2: Player, rules: Rules, mode: str, input_mode
             print(f"🏆 勝者: {champion.name}! お疲れさまでした。\n")
             return 0
 
-
-def main(argv: Optional[list[str]] = None) -> int:
-    ns = parse_args(argv or sys.argv[1:])
-    if ns.wizard:
-        ns = run_setup_wizard(ns)
-    rules = Rules(target_points=ns.target, tie_rule_both_eat=(ns.tie == "bothEat"))
-
-    if ns.mode == "1p":
-        cap = PHYSIQUE_CAPACITY[ns.physique]
-        p1 = Player(name=ns.p1_name, max_kcal=cap)
-        p2 = Player(name=ns.p2_name, max_kcal=cap)
-    else:
-        # For 2P, use wizard-provided physiques if available; otherwise prompt
-        if hasattr(ns, "_p1_physique") and hasattr(ns, "_p2_physique"):
-            p1 = Player(name=ns.p1_name, max_kcal=PHYSIQUE_CAPACITY[getattr(ns, "_p1_physique")])
-            p2 = Player(name=ns.p2_name, max_kcal=PHYSIQUE_CAPACITY[getattr(ns, "_p2_physique")])
-        else:
-            print("2P モード: 体格（small/medium/large）を P1/P2 で選んでください。")
-            def pick_cap(label: str) -> int:
-                while True:
-                    raw = input(f"{label} physique [small/medium/large] (default: medium): ").strip().lower() or "medium"
-                    if raw in PHYSIQUE_CAPACITY:
-                        return PHYSIQUE_CAPACITY[raw]
-                    print("無効な入力です。 small/medium/large を入力してください。")
-
-            p1 = Player(name=ns.p1_name, max_kcal=pick_cap("P1"))
-            p2 = Player(name=ns.p2_name, max_kcal=pick_cap("P2"))
-
-    print("\n=== Calorie Clash (Python CLI) ===")
-    print("ポイントを稼ぐか、満腹で脱落か──胃袋の限界バトル。\n")
-    print_rules(rules)
-    print_status(p1, p2, rules)
-
-    return interactive_loop(p1, p2, rules, ns.mode, ns.input)
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

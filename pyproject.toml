@@ -18,11 +18,12 @@ classifiers = [
   "Environment :: Console",
   "Topic :: Games/Entertainment",
 ]
-dependencies = []
+dependencies = [
+  "questionary>=2.0,<3.0",
+]
 
 [project.scripts]
 calorie-clash = "calorie_clash.cli.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/calorie_clash"]
-
