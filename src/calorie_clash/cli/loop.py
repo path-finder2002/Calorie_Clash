@@ -348,6 +348,8 @@ def interactive_loop(
             )
             console.print(f"[success]{winline}[/]")
         console.line()
+        # Delay status gauge output for readability
+        sleep(1)
         print_status(p1, p2, rules)
 
         over, champion = is_game_over(p1, p2, rules)
