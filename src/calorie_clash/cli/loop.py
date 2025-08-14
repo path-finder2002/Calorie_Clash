@@ -7,7 +7,7 @@ from typing import Optional
 
 from ..core.engine import is_game_over, play_round
 from ..core.types import Hand, Player, RoundResult, Rules
-from .console import console
+from .console import console, gauge_bar
 from .ui import pointer_symbol, instruction_select, q_select
 
 
@@ -24,12 +24,21 @@ def cpu_pick() -> Hand:
 
 def print_status(p1: Player, p2: Player, rules: Rules) -> None:
     console.line()
-    console.print(
-        f"[info]Status[/]: "
-        f"[bold]{p1.name}[/]: {p1.points}pt / {p1.consumed_kcal}/{p1.max_kcal}kcal | "
-        f"[bold]{p2.name}[/]: {p2.points}pt / {p2.consumed_kcal}/{p2.max_kcal}kcal | "
-        f"target=[bold]{rules.target_points}[/]"
-    )
+    # Player 1
+    p1_score_bar = gauge_bar(p1.points, rules.target_points, width=24, color="green")
+    p1_full_color = "red" if p1.consumed_kcal / max(1, p1.max_kcal) >= 0.8 else ("yellow" if p1.consumed_kcal else "cyan")
+    p1_full_bar = gauge_bar(p1.consumed_kcal, p1.max_kcal, width=24, color=p1_full_color)
+    console.print(f"[bold]{p1.name}[/]")
+    console.print(f"  Score  {p1.points}/{rules.target_points}  {p1_score_bar}")
+    console.print(f"  Full   {p1.consumed_kcal}/{p1.max_kcal} kcal  {p1_full_bar}")
+    console.line()
+    # Player 2
+    p2_score_bar = gauge_bar(p2.points, rules.target_points, width=24, color="green")
+    p2_full_color = "red" if p2.consumed_kcal / max(1, p2.max_kcal) >= 0.8 else ("yellow" if p2.consumed_kcal else "cyan")
+    p2_full_bar = gauge_bar(p2.consumed_kcal, p2.max_kcal, width=24, color=p2_full_color)
+    console.print(f"[bold]{p2.name}[/]")
+    console.print(f"  Score  {p2.points}/{rules.target_points}  {p2_score_bar}")
+    console.print(f"  Full   {p2.consumed_kcal}/{p2.max_kcal} kcal  {p2_full_bar}")
     console.line()
 
 
