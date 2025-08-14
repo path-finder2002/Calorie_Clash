@@ -3,14 +3,13 @@ from __future__ import annotations
 import questionary
 from random import choice
 from time import sleep
-import hashlib
-from secrets import token_hex
 from typing import Optional
 
 from ..core.engine import is_game_over, play_round
 from ..core.types import Hand, Player, RoundResult, Rules
 from .console import console, gauge_bar
 from .ui import pointer_symbol, instruction_select, q_select
+from ..crypto.commit import make_commit, commit_prefix
 
 
 def prompt_hand(player_name: str) -> Optional[Hand]:
@@ -113,15 +112,7 @@ def _confirm_quit(language: str, ui_ns=None) -> bool:
 
 
 def _commit_for(name: str, hand: Hand) -> tuple[str, str]:
-    """Create a commitment for (name, hand) using a random nonce.
-
-    Returns (commit_hex, nonce). Hash = sha256(nonce + name + ':' + hand_key)
-    """
-    nonce = token_hex(8)
-    hand_key = {Hand.ROCK: "ROCK", Hand.SCISSORS: "SCISSORS", Hand.PAPER: "PAPER"}[hand]
-    payload = f"{nonce}{name}:{hand_key}".encode("utf-8")
-    digest = hashlib.sha256(payload).hexdigest()
-    return digest, nonce
+    return make_commit(name, hand)
 
 
 def interactive_loop(
@@ -300,7 +291,18 @@ def interactive_loop(
             return _hand_label(h, language)
         # Confirmation step
         while True:
-            console.print(f"[info]選択中: [bold]{p1.name}[/]: {show(p1_hand)} vs [bold]{p2.name}[/]: {show(p2_hand)}")
+            # Show confirmation with hidden opponent (commitment) to keep it fair
+            if mode == "1p":
+                p1_disp = show(p1_hand)
+                p2_disp = f"[committed {commit_prefix(p2_commit[0])}]" if p2_commit else "[committed]"
+            else:  # 2p: both are hidden by commitment
+                p1_disp = f"[committed {commit_prefix(p1_commit[0])}]" if p1_commit else "[committed]"
+                p2_disp = f"[committed {commit_prefix(p2_commit[0])}]" if p2_commit else "[committed]"
+            console.print(
+                f"[info]選択中: [bold]{p1.name}[/]: {p1_disp} vs [bold]{p2.name}[/]: {p2_disp}"
+                if language != "en"
+                else f"[info]Selected: [bold]{p1.name}[/]: {p1_disp} vs [bold]{p2.name}[/]: {p2_disp}"
+            )
             confirmed = False
             if input_mode == "menu":
                 sel = q_select(
